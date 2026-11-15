@@ -9,7 +9,7 @@
       --bg: #0d0e11; --bg-elevated: #15171c; --card: #1a1d23;
       --border: #2a2f3a; --border-light: #3b4252; --text: #f2f0ea;
       --muted: #969ca8; --gold: #d8a85c; --gold-dim: rgba(216, 168, 92, 0.14);
-      --blue: #4f8ef7; --purple: #9b6ef3; --teal: #2dd4bf; --green: #2eb885;
+      --blue: #4f8ef7; --purple: #9b6ef3; --teal: #2dd4bf; --green: #2eb885; --red: #ef4444;
       --radius: 14px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -24,10 +24,11 @@
     .nav-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--bg-elevated); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; }
     .tab-btn { background: transparent; border: none; color: var(--muted); padding: 11px 8px; border-radius: 10px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .tab-btn.active { background: var(--gold); color: #111; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 16px; border-radius: 10px; font-size: 0.88rem; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; border-radius: 10px; font-size: 0.86rem; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); }
     .btn:active { transform: scale(0.97); }
     .btn-primary { background: linear-gradient(135deg, var(--gold), #c28e3e); color: #111; border: none; font-weight: 600; }
-    .btn-sm { padding: 7px 11px; font-size: 0.8rem; }
+    .btn-danger { background: rgba(239, 68, 68, 0.14); border-color: var(--red); color: #fca5a5; }
+    .btn-sm { padding: 6px 10px; font-size: 0.78rem; }
     input[type="text"], textarea, select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 11px 13px; border-radius: 10px; font-size: 0.95rem; font-family: inherit; outline: none; }
     input:focus, textarea:focus, select:focus { border-color: var(--gold); }
     .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; }
@@ -41,14 +42,29 @@
     .card.side::before { background: var(--purple); }
     .card.wife::before { background: var(--teal); }
     .card.union::before { background: var(--gold); }
-    .card-name { font-family: Georgia, serif; font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
-    .card-years { color: var(--gold); font-size: 0.84rem; margin-bottom: 8px; }
+    .card-top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .avatar-mini { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold); flex-shrink: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-weight: 700; color: var(--gold); }
+    .card-name { font-family: Georgia, serif; font-size: 1.22rem; font-weight: 700; color: #fff; line-height: 1.2; }
+    .card-maiden { font-size: 0.8rem; color: var(--muted); }
+    .card-years { color: var(--gold); font-size: 0.82rem; margin-top: 2px; }
     .card-bio { color: var(--muted); font-size: 0.88rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .card-meta { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; }
-    .upload-box { display: block; background: var(--bg-elevated); border: 2px dashed var(--border-light); border-radius: 16px; padding: 24px 16px; text-align: center; margin-bottom: 20px; cursor: pointer; }
-    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-    .photo-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; }
-    .photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .timeline { position: relative; padding-left: 18px; border-left: 2px solid var(--border-light); margin: 10px 0; }
+    .tl-item { position: relative; margin-bottom: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 11px 13px; }
+    .tl-item::before { content: ""; position: absolute; left: -25px; top: 15px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); border: 2px solid var(--bg-elevated); }
+    .tl-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 0.8rem; }
+    .tl-year { color: var(--gold); font-weight: 700; }
+    .tl-cat { background: var(--gold-dim); color: var(--gold); padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; }
+    .tl-text { font-size: 0.9rem; color: var(--text); white-space: pre-line; }
+    .source-card { background: rgba(46,184,133,0.08); border: 1px solid rgba(46,184,133,0.3); border-radius: 11px; padding: 11px 13px; margin-bottom: 8px; font-size: 0.86rem; }
+    .source-ref { color: #6ee7b7; font-weight: 600; margin-bottom: 3px; }
+    .mini-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .mini-gallery img { width: 100%; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+    .upload-box { display: block; background: var(--bg-elevated); border: 2px dashed var(--border-light); border-radius: 16px; padding: 22px 16px; text-align: center; margin-bottom: 16px; cursor: pointer; }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+    .photo-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; position: relative; }
+    .photo-card img { width: 100%; height: 210px; object-fit: cover; display: block; }
+    .doc-badge { position: absolute; top: 8px; right: 8px; background: rgba(13,14,17,0.85); border: 1px solid var(--green); color: #6ee7b7; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
     .photo-card-body { padding: 12px; }
     .photo-tags-count { font-size: 0.78rem; color: var(--gold); margin-top: 4px; }
     .tagger-wrap { position: relative; display: inline-block; width: 100%; background: #000; border-radius: 10px; overflow: hidden; }
@@ -60,11 +76,11 @@
     audio { width: 100%; height: 36px; margin-top: 8px; }
     .backdrop { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 100; align-items: center; justify-content: center; padding: 12px; }
     .backdrop.open { display: flex; }
-    .modal { background: var(--bg-elevated); border: 1px solid var(--border-light); border-radius: 18px; max-width: 620px; width: 100%; padding: 22px; max-height: 92vh; overflow-y: auto; }
+    .modal { background: var(--bg-elevated); border: 1px solid var(--border-light); border-radius: 18px; max-width: 640px; width: 100%; padding: 22px; max-height: 92vh; overflow-y: auto; }
     .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-    .close-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
+    .close-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
     .field { margin-bottom: 12px; }
-    .label { display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    .label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gold); color: #111; font-weight: 600; padding: 10px 20px; border-radius: 99px; z-index: 300; transition: 0.25s; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .hidden { display: none !important; }
@@ -82,21 +98,20 @@
       </div>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="openModal('addPersonModal')">＋ Предок</button>
+      <button class="btn btn-primary" onclick="openAddPerson()">＋ Предок</button>
+      <button class="btn" id="shareLinkBtn">🔗 Родне</button>
       <button class="btn" onclick="openModal('cloudModal')">⚙ Облако</button>
     </div>
   </header>
 
   <nav class="nav-tabs">
     <button class="tab-btn active" data-tab="treeTab">Древо рода</button>
-    <button class="tab-btn" data-tab="photosTab">Фото и лица</button>
+    <button class="tab-btn" data-tab="photosTab">Фото и сканы</button>
     <button class="tab-btn" data-tab="storiesTab">Диктофон</button>
   </nav>
 
   <section id="treeTab">
-    <div style="margin-bottom: 12px;">
-      <input type="text" id="searchInput" placeholder="Поиск по имени, фамилии, деревне, наградам...">
-    </div>
+    <div style="margin-bottom: 12px;"><input type="text" id="searchInput" placeholder="Поиск по имени, фамилии, учёбе, работе, фонду НИАБ..."></div>
     <div class="filter-row">
       <button class="pill active" data-filter="all">Весь род</button>
       <button class="pill" data-filter="direct">Линия Николая</button>
@@ -108,10 +123,16 @@
   </section>
 
   <section id="photosTab" class="hidden">
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <select id="uploadTypeSelect" style="max-width:240px;">
+        <option value="photo">📸 Загрузить как Фото</option>
+        <option value="doc">📄 Загрузить как Архивный скан</option>
+      </select>
+    </div>
     <label class="upload-box" for="photoFileInput">
-      <div style="font-size: 2rem; margin-bottom: 6px;">📸</div>
-      <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Загрузить фото пачкой с телефона</div>
-      <div style="font-size: 0.84rem; color: var(--muted);">Выбери сразу несколько снимков. Сайт сожмёт их и откроет разметку лиц.</div>
+      <div style="font-size: 2rem; margin-bottom: 6px;">📂</div>
+      <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Выбрать файлы пачкой с телефона</div>
+      <div style="font-size: 0.84rem; color: var(--muted);">Фотографии альбомов или сканы ревизий НИАБ. Сжимаются автоматически.</div>
       <input type="file" id="photoFileInput" accept="image/*" multiple class="hidden">
     </label>
     <div id="uploadProgress" style="text-align:center; color:var(--gold); margin-bottom:14px; font-size:0.9rem;" class="hidden"></div>
@@ -121,14 +142,8 @@
   <section id="storiesTab" class="hidden">
     <div class="rec-panel">
       <div style="font-weight: 600; margin-bottom: 10px; color: var(--gold);">Записать воспоминание со слов родных</div>
-      <div class="field">
-        <label class="label">О ком или от кого запись?</label>
-        <select id="storyPersonSelect"></select>
-      </div>
-      <div class="field">
-        <label class="label">Текст байки (можно надиктовать голосом)</label>
-        <textarea id="storyTextInput" rows="3" placeholder="Нажми «Голос в текст» или впиши вручную..."></textarea>
-      </div>
+      <div class="field"><label class="label">О ком или от кого запись?</label><select id="storyPersonSelect"></select></div>
+      <div class="field"><label class="label">Текст байки (можно надиктовать голосом)</label><textarea id="storyTextInput" rows="3" placeholder="Нажми «Голос в текст» или впиши вручную..."></textarea></div>
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
         <button type="button" class="btn btn-sm" id="speechToTextBtn">🗣 Голос в текст</button>
         <button type="button" class="btn btn-sm" id="recordAudioBtn">🔴 Записать звук</button>
@@ -142,35 +157,109 @@
     <div id="storiesList"></div>
   </section>
 </div>
-
 <div class="backdrop" id="personModal">
   <div class="modal">
     <div class="modal-head">
-      <div>
-        <h2 id="mName" style="font-family:Georgia,serif; font-size:1.7rem;"></h2>
-        <div id="mYears" style="color:var(--gold); font-size:0.9rem;"></div>
+      <div style="display:flex; gap:14px; align-items:center;">
+        <img id="mAvatar" src="" class="avatar-mini hidden" style="width:64px; height:64px;">
+        <div>
+          <h2 id="mName" style="font-family:Georgia,serif; font-size:1.65rem; line-height:1.15;"></h2>
+          <div id="mMaiden" style="color:var(--muted); font-size:0.84rem;"></div>
+          <div id="mYears" style="color:var(--gold); font-size:0.9rem; margin-top:2px;"></div>
+        </div>
       </div>
       <button class="close-btn" onclick="closeModal('personModal')">&times;</button>
     </div>
-    <div class="field"><div class="label">Биография</div><div id="mBio" style="font-size:0.95rem;"></div></div>
-    <div class="field"><div class="label">Локация</div><div id="mLoc" style="color:var(--muted); font-size:0.9rem;"></div></div>
-    <div class="field" id="mArchiveBlock"><div class="label">Архив НИАБ / Поиск</div><div id="mArchive" style="background:rgba(46,184,133,0.1); border:1px solid rgba(46,184,133,0.3); padding:10px; border-radius:10px; color:#8ce6c3; font-size:0.88rem;"></div></div>
-    <div class="field" id="mStoriesBlock"><div class="label">Записанные воспоминания</div><div id="mStories"></div></div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn btn-sm" id="editPersonBtn">✏️ Анкета</button>
+      <button class="btn btn-primary btn-sm" id="openAddEventBtn">＋ Веха жизни</button>
+      <button class="btn btn-sm" id="openAddSourceBtn">📜 Источник НИАБ</button>
+    </div>
+
+    <div id="mQuoteBlock" class="hidden" style="font-family:Georgia,serif; font-style:italic; color:var(--gold); background:var(--gold-dim); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:0.95rem;"></div>
+
+    <div class="field"><div class="label">О человеке</div><div id="mBio" style="font-size:0.95rem; white-space:pre-line;"></div></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+      <div><div class="label">География</div><div id="mLoc" style="color:var(--muted); font-size:0.88rem;"></div></div>
+      <div id="mBurialBlock" class="hidden"><div class="label">Память / Захоронение</div><div id="mBurial" style="color:var(--muted); font-size:0.88rem;"></div></div>
+    </div>
+
+    <div class="field">
+      <div class="label">Жизненный путь (учёба, работа, события)</div>
+      <div id="mTimeline" class="timeline"></div>
+    </div>
+
+    <div class="field">
+      <div class="label">Архивные источники, ревизии и документы</div>
+      <div id="mSourcesList"></div>
+      <div id="mArchiveLegacy" class="source-card hidden"><div class="source-ref">Архивная заметка</div><div id="mArchive"></div></div>
+    </div>
+
+    <div class="field" id="mPhotosBlock" class="hidden">
+      <div class="label">Фотографии и сканы с привязкой</div>
+      <div id="mPhotos" class="mini-gallery"></div>
+    </div>
+
+    <div class="field" id="mStoriesBlock"><div class="label">Записанные голосом воспоминания</div><div id="mStories"></div></div>
+  </div>
+</div>
+
+<div class="backdrop" id="eventModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="eventModalTitle">Новая веха в жизни</h3>
+      <button class="close-btn" onclick="closeModal('eventModal')">&times;</button>
+    </div>
+    <form id="eventForm">
+      <input type="hidden" id="evIdx">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field"><label class="label">Год / Период *</label><input type="text" id="evYear" required placeholder="2012 – 2017"></div>
+        <div class="field">
+          <label class="label">Категория</label>
+          <select id="evCat">
+            <option value="🎓 Учёба">🎓 Учёба</option>
+            <option value="💼 Работа и дело">💼 Работа и дело</option>
+            <option value="🏠 Переезд / Дом">🏠 Переезд / Дом</option>
+            <option value="💍 Семья">💍 Семья</option>
+            <option value="🎖 Подвиг / Награда">🎖 Подвиг / Награда</option>
+            <option value="✨ Важная веха">✨ Важная веха</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label class="label">Описание *</label><textarea id="evText" rows="3" required placeholder="Где училась, специальность, кем работала, важные события..."></textarea></div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-danger btn-sm hidden" id="deleteEventBtn">🗑 Удалить</button>
+        <button type="submit" class="btn btn-primary" style="flex:1;">Сохранить веху</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="backdrop" id="sourceModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Прикрепить архивный источник</h3>
+      <button class="close-btn" onclick="closeModal('sourceModal')">&times;</button>
+    </div>
+    <form id="sourceForm">
+      <div class="field"><label class="label">Шифр архива / Источник *</label><input type="text" id="srcRef" required placeholder="НИАБ Ф.333 Оп.9 Д.123 Л.45 (Ревизия 1858 г.)"></div>
+      <div class="field"><label class="label">Выписка / Расшифровка факта *</label><textarea id="srcText" rows="3" required placeholder="Что именно написано в документе про двор, возраст, состав семьи..."></textarea></div>
+      <div class="field"><label class="label">Привязать скан из галереи (если загружен)</label><select id="srcScanSelect"><option value="">— Без скана —</option></select></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Прикрепить к предку</button>
+    </form>
   </div>
 </div>
 
 <div class="backdrop" id="photoModal">
   <div class="modal">
     <div class="modal-head">
-      <div>
-        <h3 style="color:#fff;">Кто на фото?</h3>
-        <div style="font-size:0.8rem; color:var(--muted);">Ткни пальцем в лицо на снимке</div>
-      </div>
+      <div><h3 style="color:#fff;">Разметка снимка / скана</h3><div style="font-size:0.8rem; color:var(--muted);">Ткни пальцем в лицо или строку в документе</div></div>
       <button class="close-btn" onclick="closeModal('photoModal')">&times;</button>
     </div>
     <div class="tagger-wrap" id="taggerWrap"><img id="taggerImg" src="" alt=""></div>
     <div id="tagPickerBox" class="hidden" style="margin-top:12px; padding:12px; background:var(--card); border-radius:10px; border:1px solid var(--gold);">
-      <div style="font-size:0.85rem; margin-bottom:8px; color:var(--gold);">Выбери человека:</div>
+      <div style="font-size:0.85rem; margin-bottom:8px; color:var(--gold);">Кого отметить в этой точке?</div>
       <select id="tagPersonSelect" style="margin-bottom:8px;"></select>
       <div style="display:flex; gap:8px;">
         <button class="btn btn-primary btn-sm" id="confirmTagBtn">Поставить метку</button>
@@ -178,11 +267,8 @@
       </div>
     </div>
     <div class="field" style="margin-top:12px;">
-      <div class="label">Подпись к фото</div>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="photoCaptionInput" placeholder="Год, место, событие...">
-        <button class="btn btn-primary btn-sm" id="saveCaptionBtn">ОК</button>
-      </div>
+      <div class="label">Подпись / Шифр дела</div>
+      <div style="display:flex; gap:8px;"><input type="text" id="photoCaptionInput" placeholder="Год, место или шифр НИАБ..."><button class="btn btn-primary btn-sm" id="saveCaptionBtn">ОК</button></div>
     </div>
   </div>
 </div>
@@ -190,11 +276,16 @@
 <div class="backdrop" id="addPersonModal">
   <div class="modal">
     <div class="modal-head">
-      <h3>Добавить родственника</h3>
+      <h3 id="personFormTitle">Добавить родственника</h3>
       <button class="close-btn" onclick="closeModal('addPersonModal')">&times;</button>
     </div>
     <form id="addPersonForm">
+      <input type="hidden" id="editPersonId">
       <div class="field"><label class="label">ФИО полностью *</label><input type="text" id="fName" required placeholder="Фамилия Имя Отчество"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field"><label class="label">Девичья фамилия</label><input type="text" id="fMaiden" placeholder="Если менялась"></div>
+        <div class="field"><label class="label">Годы жизни / Дата рожд.</label><input type="text" id="fYears" placeholder="1929 – 2012"></div>
+      </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
         <div class="field">
           <label class="label">Колено</label>
@@ -207,15 +298,19 @@
         <div class="field">
           <label class="label">Линия</label>
           <select id="fBranch">
-            <option value="direct">Линия Николая</option><option value="wife">Линия Елены</option><option value="side">Боковая ветвь</option>
+            <option value="direct">Линия Николая</option><option value="wife">Линия Елены</option><option value="side">Боковая ветвь</option><option value="union">Общий род</option>
           </select>
         </div>
       </div>
-      <div class="field"><label class="label">Годы жизни</label><input type="text" id="fYears" placeholder="1925 – 1998"></div>
-      <div class="field"><label class="label">Локация</label><input type="text" id="fLoc" value="д. Козловка (Глебопечи)"></div>
-      <div class="field"><label class="label">Биография</label><textarea id="fBio" rows="3"></textarea></div>
-      <div class="field"><label class="label">Архив НИАБ / Поиск</label><input type="text" id="fArchive" placeholder="Фонд, опись, лист..."></div>
-      <button type="submit" class="btn btn-primary" style="width:100%;">Сохранить</button>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field"><label class="label">Города / Деревня</label><input type="text" id="fLoc" placeholder="д. Козловка"></div>
+        <div class="field"><label class="label">Захоронение / Память</label><input type="text" id="fBurial" placeholder="Кладбище, квартал, ряд"></div>
+      </div>
+      <div class="field"><label class="label">Цитата / Девиз человека</label><input type="text" id="fQuote" placeholder="Любимая фраза..."></div>
+      <div class="field"><label class="label">Портрет (из загруженных фото)</label><select id="fAvatarSelect"><option value="">— Без портрета —</option></select></div>
+      <div class="field"><label class="label">Общая биография</label><textarea id="fBio" rows="3"></textarea></div>
+      <div class="field"><label class="label">Краткая архивная пометка</label><input type="text" id="fArchive" placeholder="НИАБ Ф.333 Оп.9 или статус поиска"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Сохранить досье</button>
     </form>
   </div>
 </div>
@@ -223,31 +318,23 @@
 <div class="backdrop" id="cloudModal">
   <div class="modal">
     <div class="modal-head">
-      <h3>Облако Supabase и резервная копия</h3>
+      <h3>Облако Supabase и ссылка для родни</h3>
       <button class="close-btn" onclick="closeModal('cloudModal')">&times;</button>
     </div>
-    <p style="font-size:0.86rem; color:var(--muted); margin-bottom:14px;">Вставь ключи из Supabase (Project Settings -> API), чтобы данные синхронизировались между телефонами.</p>
+    <p style="font-size:0.86rem; color:var(--muted); margin-bottom:14px;">Вставь ключи один раз. После подключения нажми «🔗 Родне» в шапке — скопируется ссылка, по которой у жены и родных всё подключится само.</p>
     <div class="field"><label class="label">Project URL</label><input type="text" id="sbUrlInput" placeholder="https://supabase.co"></div>
-    <div class="field"><label class="label">anon public key</label><input type="text" id="sbKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..."></div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn btn-primary" id="saveCloudBtn">Подключить</button>
-      <button class="btn" id="exportBackupBtn">⬇ Скачать JSON</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast">Готово</div>
 <script>
   const SEED_PERSONS = [
     { id: "daughter", gen: 1, branch: "union", name: "Дочка", years: "1-е колено", location: "Мончегорск / Беларусь", bio: "Объединение родов Николая и Елены.", archive_note: "", stories: [] },
-    { id: "user", gen: 2, branch: "direct", name: "Николай Юрьевич Кузьмич", years: "2-е колено", location: "Мончегорск / Светлогорск", bio: "Автор летописи.", archive_note: "", stories: [] },
-    { id: "wife_lena", gen: 2, branch: "wife", name: "Елена (Супруга)", years: "2-е колено • Линия жены", location: "Мончегорск / Беларусь", bio: "Родовая ветвь супруги.", archive_note: "", stories: [] },
+    { id: "user", gen: 2, branch: "direct", name: "Николай Юрьевич Кузьмич", years: "2-е колено", location: "Мончегорск / Светлогорск", bio: "Автор и составитель семейной летописи.", archive_note: "", stories: [] },
+    { id: "wife_lena", gen: 2, branch: "wife", name: "Елена (Супруга)", years: "2-е колено • Линия жены", location: "Мончегорск / Беларусь", bio: "Хранительница очага. Нажми «Анкета» и «＋ Веха жизни», чтобы заполнить учёбу, работу и историю жизни.", archive_note: "", stories: [] },
     { id: "father_kuzmich", gen: 2, branch: "direct", name: "Кузьмич (Отец)", years: "Отцовская линия", location: "г. Светлогорск", bio: "Отцовская ветвь.", archive_note: "Поиск захоронения в Светлогорске через КЖУП «Светочь».", stories: [] },
     { id: "polina", gen: 3, branch: "direct", name: "Полина Николаевна Баранова", years: "1968 – 2007", location: "Светлогорск / д. Козловка", bio: "Мама. 3-е колено прямой материнской линии.", archive_note: "", stories: [] },
     { id: "valentina", gen: 3, branch: "side", name: "Валентина Лаврентьевна Новицкая", years: "3-е колено", location: "Беларусь", bio: "Тётка. Муж Геннадий Новицкий, дети Татьяна и Андрей.", archive_note: "", stories: [] },
     { id: "zhanna", gen: 3, branch: "side", name: "Жанна Лаврентьевна Тептикова", years: "3-е колено", location: "Беларусь", bio: "Тётка. Муж Анатолий Тептиков, дети Кирилл и Геннадий.", archive_note: "", stories: [] },
-    { id: "natalya", gen: 3, branch: "side", name: "Наталья Лаврентьевна Папруга (Митрахович)", years: "1918 – 1996", location: "Беларусь", bio: "Сестра бабушки Прасковьи.", archive_note: "", stories: [] },
+    { id: "natalya", gen: 3, branch: "side", name: "Наталья Лаврентьевна Папруга", years: "1918 – 1996", location: "Беларусь", bio: "Сестра бабушки Прасковьи.", archive_note: "", stories: [{ type: "meta", maiden: "Митрахович" }] },
     { id: "nikolai_b", gen: 4, branch: "direct", name: "Николай Михайлович Баранов", years: "1930 – 1994", location: "д. Козловка (Глебопечи)", bio: "Дед по материнской линии.", archive_note: "", stories: [] },
-    { id: "praskovya", gen: 4, branch: "direct", name: "Прасковья Лаврентьевна Баранова (Митрахович)", years: "1929 – 2012", location: "д. Козловка (Глебопечи)", bio: "Бабушка. Одна из выживших сестёр большой раскулаченной семьи.", archive_note: "", stories: [] },
+    { id: "praskovya", gen: 4, branch: "direct", name: "Прасковья Лаврентьевна Баранова", years: "1929 – 2012", location: "д. Козловка (Глебопечи)", bio: "Бабушка. Одна из выживших сестёр большой раскулаченной семьи.", archive_note: "", stories: [{ type: "meta", maiden: "Митрахович" }] },
     { id: "mikhail_m", gen: 4, branch: "side", name: "Михаил Лаврентьевич Митрахович", years: "род. 13.09.1923", location: "Козловка — Кёнигсберг", bio: "Двоюродный дед. Инженер-майор, техник танкового полка, брал Кёнигсберг. Ордена Красной Звезды и Отеч. войны.", archive_note: "Подтверждено по наградным документам.", stories: [] },
     { id: "mikhail_b", gen: 5, branch: "direct", name: "Михаил Баранов", years: "ок. 1900 г.р.", location: "д. Козловка (Глебопечи)", bio: "Прадед по линии деда Николая.", archive_note: "НИАБ Ф.333 Оп.9: ревизии 1858, 1850, 1834 гг.", stories: [] },
     { id: "kseniya", gen: 5, branch: "direct", name: "Ксения Павловна Митрахович", years: "1890 – 1973", location: "д. Козловка (Глебопечи)", bio: "Прабабка. Около 10 детей, 5 дочерей, семья раскулачена (хозяйство предка Павла).", archive_note: "НИАБ Ф.333 Оп.9: сверка дворов Митраховичей.", stories: [] },
@@ -255,76 +342,76 @@
     { id: "pavel_m", gen: 6, branch: "direct", name: "Павел (предок Ксении Павловны)", years: "XIX век", location: "д. Козловка (Глебопечи)", bio: "Прапрадед. Зажиточный крестьянин, раскулачен.", archive_note: "НИАБ Ф.333 Оп.9: ревизии 1858, 1850, 1834 гг.", stories: [] }
   ];
 
+  (function checkMagicParams() {
+    const params = new URLSearchParams(window.location.search);
+    const u = params.get("u"), k = params.get("k");
+    if (u && k) {
+      localStorage.setItem("sb_url", decodeURIComponent(u));
+      localStorage.setItem("sb_key", decodeURIComponent(k));
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  })();
+
   let persons = JSON.parse(localStorage.getItem("chronicle_persons")) || SEED_PERSONS;
   let mediaList = JSON.parse(localStorage.getItem("chronicle_media")) || [];
-  let currentFilter = "all";
-  let activePhoto = null;
-  let pendingClickCoords = null;
-  let recordedAudioBlob = null;
-  let mediaRecorder = null;
+  let currentFilter = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null, recordedAudioBlob = null, mediaRecorder = null;
 
-  function toast(msg) {
-    const el = document.getElementById("toast");
-    el.textContent = msg;
-    el.classList.add("show");
-    setTimeout(() => el.classList.remove("show"), 2600);
-  }
+  function toast(msg) { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600); }
   function openModal(id) { document.getElementById(id).classList.add("open"); }
   function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+  function getMeta(p) { return (p.stories || []).find(s => s.type === "meta") || {}; }
 
   async function sbFetch(table, method = "GET", body = null, query = "") {
-    const url = localStorage.getItem("sb_url");
-    const key = localStorage.getItem("sb_key");
+    const url = localStorage.getItem("sb_url"), key = localStorage.getItem("sb_key");
     if (!url || !key) return null;
-    const headers = { "apikey": key, "Authorization": "Bearer " + key, "Content-Type": "application/json", "Prefer": "return=representation" };
-    const res = await fetch(`${url}/rest/v1/${table}${query}`, { method, headers, body: body ? JSON.stringify(body) : null });
-    if (!res.ok) throw new Error("Ошибка БД");
+    const res = await fetch(url + "/rest/v1/" + table + query, {
+      method, headers: { "apikey": key, "Authorization": "Bearer " + key, "Content-Type": "application/json", "Prefer": "return=representation" },
+      body: body ? JSON.stringify(body) : null
+    });
+    if (!res.ok) throw new Error("DB error");
     return res.json();
   }
 
   async function sbUpload(fileName, blob, contentType) {
-    const url = localStorage.getItem("sb_url");
-    const key = localStorage.getItem("sb_key");
+    const url = localStorage.getItem("sb_url"), key = localStorage.getItem("sb_key");
     if (!url || !key) return null;
-    const res = await fetch(`${url}/storage/v1/object/photos/${fileName}`, {
-      method: "POST",
-      headers: { "apikey": key, "Authorization": "Bearer " + key, "Content-Type": contentType },
-      body: blob
+    const res = await fetch(url + "/storage/v1/object/photos/" + fileName, {
+      method: "POST", headers: { "apikey": key, "Authorization": "Bearer " + key, "Content-Type": contentType }, body: blob
     });
-    if (!res.ok) return null;
-    return `${url}/storage/v1/object/public/photos/${fileName}`;
+    return res.ok ? (url + "/storage/v1/object/public/photos/" + fileName) : null;
   }
 
   async function initCloud() {
-    const url = localStorage.getItem("sb_url");
-    const key = localStorage.getItem("sb_key");
+    const url = localStorage.getItem("sb_url"), key = localStorage.getItem("sb_key");
     if (!url || !key) return;
-    document.getElementById("sbUrlInput").value = url;
-    document.getElementById("sbKeyInput").value = key;
+    document.getElementById("sbUrlInput").value = url; document.getElementById("sbKeyInput").value = key;
     try {
       const pData = await sbFetch("persons", "GET", null, "?select=*");
       if (pData) {
-        if (pData.length === 0) { await sbFetch("persons", "POST", persons); }
+        if (pData.length === 0) await sbFetch("persons", "POST", persons);
         else { persons = pData; localStorage.setItem("chronicle_persons", JSON.stringify(persons)); }
         const mData = await sbFetch("media", "GET", null, "?select=*&order=created_at.desc");
         if (mData) { mediaList = mData; localStorage.setItem("chronicle_media", JSON.stringify(mediaList)); }
         document.getElementById("cloudDot").classList.add("online");
         document.getElementById("cloudStatusText").textContent = "Облако Supabase подключено";
       }
-    } catch (e) { document.getElementById("cloudStatusText").textContent = "Ошибка облака (проверь ключи)"; }
+    } catch (e) { document.getElementById("cloudStatusText").textContent = "Ошибка облака"; }
     renderAll();
   }
 
   document.getElementById("saveCloudBtn").onclick = async () => {
-    const url = document.getElementById("sbUrlInput").value.trim().replace(/\/$/, "");
-    const key = document.getElementById("sbKeyInput").value.trim();
+    const url = document.getElementById("sbUrlInput").value.trim().replace(/\/$/, ""), key = document.getElementById("sbKeyInput").value.trim();
     if (!url || !key) return toast("Вставь URL и ключ!");
-    localStorage.setItem("sb_url", url);
-    localStorage.setItem("sb_key", key);
-    closeModal("cloudModal");
-    toast("Подключаю...");
-    await initCloud();
-    toast("Синхронизация завершена!");
+    localStorage.setItem("sb_url", url); localStorage.setItem("sb_key", key);
+    closeModal("cloudModal"); toast("Подключаю..."); await initCloud(); toast("Синхронизация завершена!");
+  };
+
+  document.getElementById("shareLinkBtn").onclick = () => {
+    const url = localStorage.getItem("sb_url"), key = localStorage.getItem("sb_key");
+    if (!url || !key) return toast("Сначала подключи Облако!");
+    const shareUrl = window.location.origin + window.location.pathname + "?u=" + encodeURIComponent(url) + "&k=" + encodeURIComponent(key);
+    navigator.clipboard.writeText(shareUrl);
+    toast("Ссылка для родни скопирована!");
   };
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -335,33 +422,31 @@
       document.getElementById(btn.dataset.tab).classList.remove("hidden");
     };
   });
-
   function renderTree() {
-    const container = document.getElementById("treeContainer");
-    const q = document.getElementById("searchInput").value.toLowerCase().trim();
+    const container = document.getElementById("treeContainer"), q = document.getElementById("searchInput").value.toLowerCase().trim();
     container.innerHTML = "";
     const filtered = persons.filter(p => {
       if (currentFilter === "direct" && p.branch !== "direct" && p.branch !== "union") return false;
       if (currentFilter === "wife" && p.branch !== "wife" && p.branch !== "union") return false;
       if (currentFilter === "side" && p.branch !== "side") return false;
-      if (currentFilter === "archive" && !p.archive_note) return false;
+      if (currentFilter === "archive" && !p.archive_note && !(p.stories || []).some(s => s.type === "source")) return false;
       if (!q) return true;
-      return `${p.name} ${p.years} ${p.location} ${p.bio} ${p.archive_note || ""}`.toLowerCase().includes(q);
+      const meta = getMeta(p);
+      const extra = (p.stories || []).map(s => (s.year || "") + " " + (s.ref || "") + " " + (s.text || "")).join(" ");
+      return (p.name + " " + (meta.maiden || "") + " " + p.years + " " + p.location + " " + p.bio + " " + extra + " " + (p.archive_note || "")).toLowerCase().includes(q);
     });
     const gens = [...new Set(filtered.map(p => p.gen))].sort((a, b) => a - b);
     gens.forEach(gen => {
-      const title = document.createElement("div");
-      title.className = "gen-title";
-      title.textContent = `${gen}-е колено`;
-      container.appendChild(title);
-      const grid = document.createElement("div");
-      grid.className = "grid";
+      const title = document.createElement("div"); title.className = "gen-title"; title.textContent = gen + "-е колено"; container.appendChild(title);
+      const grid = document.createElement("div"); grid.className = "grid";
       filtered.filter(p => p.gen === gen).forEach(p => {
-        const card = document.createElement("div");
-        card.className = `card ${p.branch}`;
-        card.onclick = () => openPersonCard(p.id);
-        const storiesCount = (p.stories || []).length;
-        card.innerHTML = `<div class="card-name">${p.name}</div><div class="card-years">${p.years || ""}</div><div class="card-bio">${p.bio || ""}</div><div class="card-meta"><span>📍 ${p.location || ""}</span><span>${storiesCount ? "🎙 Баек: " + storiesCount : (p.archive_note ? "📜 НИАБ" : "")}</span></div>`;
+        const card = document.createElement("div"); card.className = "card " + p.branch; card.onclick = () => openPersonCard(p.id);
+        const meta = getMeta(p);
+        const avatarHtml = meta.avatar ? '<img src="' + meta.avatar + '" class="avatar-mini">' : '<div class="avatar-mini">' + p.name.slice(0, 2).toUpperCase() + '</div>';
+        const maidenHtml = meta.maiden ? '<div class="card-maiden">дев. ' + meta.maiden + '</div>' : '';
+        const evCount = (p.stories || []).filter(s => s.type === "event").length;
+        const srcCount = (p.stories || []).filter(s => s.type === "source").length + (p.archive_note ? 1 : 0);
+        card.innerHTML = '<div class="card-top">' + avatarHtml + '<div><div class="card-name">' + p.name + '</div>' + maidenHtml + '<div class="card-years">' + (p.years || "") + '</div></div></div><div class="card-bio">' + (p.bio || "") + '</div><div class="card-meta"><span>📍 ' + (p.location || "") + '</span><span>' + (evCount ? "📖 " + evCount + " " : "") + (srcCount ? "📜 " + srcCount : "") + '</span></div>';
         grid.appendChild(card);
       });
       container.appendChild(grid);
@@ -371,47 +456,214 @@
   function openPersonCard(id) {
     const p = persons.find(x => x.id === id);
     if (!p) return;
+    activePersonId = id;
+    const meta = getMeta(p);
+    const avEl = document.getElementById("mAvatar");
+    if (meta.avatar) { avEl.src = meta.avatar; avEl.classList.remove("hidden"); } else { avEl.classList.add("hidden"); }
+
     document.getElementById("mName").textContent = p.name;
-    document.getElementById("mYears").textContent = `${p.gen}-е колено • ${p.years || ""}`;
+    document.getElementById("mMaiden").textContent = meta.maiden ? ("Девичья фамилия: " + meta.maiden) : "";
+    document.getElementById("mYears").textContent = p.gen + "-е колено • " + (p.years || "");
     document.getElementById("mBio").textContent = p.bio || "Нет описания";
     document.getElementById("mLoc").textContent = "📍 " + (p.location || "Не указано");
-    const archBlock = document.getElementById("mArchiveBlock");
-    if (p.archive_note) { archBlock.style.display = "block"; document.getElementById("mArchive").textContent = p.archive_note; }
-    else { archBlock.style.display = "none"; }
-    const stBlock = document.getElementById("mStoriesBlock");
-    const stList = document.getElementById("mStories");
-    stList.innerHTML = "";
 
-    if (p.stories && p.stories.length > 0) {
+    const bBlock = document.getElementById("mBurialBlock");
+    if (meta.burial) { bBlock.classList.remove("hidden"); document.getElementById("mBurial").textContent = "🪦 " + meta.burial; } else { bBlock.classList.add("hidden"); }
+
+    const qBlock = document.getElementById("mQuoteBlock");
+    if (meta.quote) { qBlock.textContent = "«" + meta.quote + "»"; qBlock.classList.remove("hidden"); } else { qBlock.classList.add("hidden"); }
+
+    const tlEl = document.getElementById("mTimeline"); tlEl.innerHTML = "";
+    const events = (p.stories || []).map((s, idx) => Object.assign({}, s, { idx: idx })).filter(s => s.type === "event");
+    if (events.length === 0) {
+      tlEl.innerHTML = '<div style="font-size:0.84rem; color:var(--muted);">Пока нет записей. Нажми «＋ Веха жизни», чтобы добавить учёбу, работу или события.</div>';
+    } else {
+      events.forEach(ev => {
+        const item = document.createElement("div"); item.className = "tl-item";
+        item.innerHTML = '<div class="tl-head"><div><span class="tl-year">' + ev.year + '</span> <span class="tl-cat">' + ev.cat + '</span></div><button class="btn btn-sm" style="padding:2px 7px;" onclick="openEditEvent(' + ev.idx + ')">✎</button></div><div class="tl-text">' + ev.text + '</div>';
+        tlEl.appendChild(item);
+      });
+    }
+
+    const srcListEl = document.getElementById("mSourcesList"); srcListEl.innerHTML = "";
+    const sources = (p.stories || []).filter(s => s.type === "source");
+    sources.forEach(src => {
+      const box = document.createElement("div"); box.className = "source-card";
+      const scanLink = src.scanUrl ? '<div style="margin-top:6px;"><a href="#" style="color:var(--gold); font-size:0.8rem;" onclick="event.preventDefault(); closeModal(\'personModal\'); openPhotoByUrl(\'' + src.scanUrl + '\')">📄 Открыть прикреплённый скан</a></div>' : '';
+      box.innerHTML = '<div class="source-ref">📜 ' + src.ref + '</div><div>' + src.text + '</div>' + scanLink;
+      srcListEl.appendChild(box);
+    });
+    const legBlock = document.getElementById("mArchiveLegacy");
+    if (p.archive_note) { legBlock.classList.remove("hidden"); document.getElementById("mArchive").textContent = p.archive_note; } else { legBlock.classList.add("hidden"); }
+
+    const pPhotos = mediaList.filter(m => (m.tags || []).some(t => t.personId === id));
+    const phBlock = document.getElementById("mPhotosBlock"), phGrid = document.getElementById("mPhotos"); phGrid.innerHTML = "";
+    if (pPhotos.length > 0) {
+      phBlock.classList.remove("hidden");
+      pPhotos.forEach(m => {
+        const img = document.createElement("img"); img.src = m.file_url;
+        img.onclick = () => { closeModal("personModal"); openPhotoTagger(m.id); };
+        phGrid.appendChild(img);
+      });
+    } else { phBlock.classList.add("hidden"); }
+
+    const stBlock = document.getElementById("mStoriesBlock"), stList = document.getElementById("mStories"); stList.innerHTML = "";
+    const voices = (p.stories || []).filter(s => !s.type);
+    if (voices.length > 0) {
       stBlock.style.display = "block";
-      p.stories.forEach(s => {
-        const div = document.createElement("div");
-        div.className = "story-item";
-        div.innerHTML = `<div class="story-header"><span>${s.date || ""}</span></div><div>${s.text || ""}</div>${s.audioUrl ? `<audio controls src="${s.audioUrl}"></audio>` : ""}`;
+      voices.forEach(s => {
+        const div = document.createElement("div"); div.className = "story-item";
+        div.innerHTML = '<div class="story-header"><span>' + (s.date || "") + '</span></div><div>' + (s.text || "") + '</div>' + (s.audioUrl ? '<audio controls src="' + s.audioUrl + '"></audio>' : '');
         stList.appendChild(div);
       });
     } else { stBlock.style.display = "none"; }
     openModal("personModal");
   }
 
-  document.getElementById("addPersonForm").onsubmit = async (e) => {
-    e.preventDefault();
-    const newP = {
-      id: "p_" + Date.now(), gen: parseInt(document.getElementById("fGen").value, 10),
-      branch: document.getElementById("fBranch").value, name: document.getElementById("fName").value.trim(),
-      years: document.getElementById("fYears").value.trim(), location: document.getElementById("fLoc").value.trim(),
-      bio: document.getElementById("fBio").value.trim(), archive_note: document.getElementById("fArchive").value.trim(), stories: []
-    };
-    persons.push(newP);
-    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
-    try { await sbFetch("persons", "POST", [newP]); } catch (err) {}
-    closeModal("addPersonModal");
-    e.target.reset();
-    renderAll();
-    toast("Предок добавлен!");
+  function openPhotoByUrl(url) { const m = mediaList.find(x => x.file_url === url); if (m) openPhotoTagger(m.id); }
+
+  function openAddPerson() {
+    document.getElementById("personFormTitle").textContent = "Добавить родственника";
+    document.getElementById("editPersonId").value = "";
+    document.getElementById("addPersonForm").reset();
+    populateMediaSelects("");
+    openModal("addPersonModal");
+  }
+
+  document.getElementById("editPersonBtn").onclick = () => {
+    const p = persons.find(x => x.id === activePersonId);
+    if (!p) return;
+    const meta = getMeta(p);
+    document.getElementById("personFormTitle").textContent = "Редактировать анкету";
+    document.getElementById("editPersonId").value = p.id;
+    document.getElementById("fName").value = p.name;
+    document.getElementById("fMaiden").value = meta.maiden || "";
+    document.getElementById("fGen").value = p.gen;
+    document.getElementById("fBranch").value = p.branch;
+    document.getElementById("fYears").value = p.years || "";
+    document.getElementById("fLoc").value = p.location || "";
+    document.getElementById("fBurial").value = meta.burial || "";
+    document.getElementById("fQuote").value = meta.quote || "";
+    document.getElementById("fBio").value = p.bio || "";
+    document.getElementById("fArchive").value = p.archive_note || "";
+    populateMediaSelects(meta.avatar || "");
+    closeModal("personModal"); openModal("addPersonModal");
   };
 
-  function compressImage(file, maxWidth = 1400, quality = 0.8) {
+  function populateMediaSelects(selectedUrl) {
+    const opts = '<option value="">— Не выбрано —</option>' + mediaList.map(m => '<option value="' + m.file_url + '" ' + (m.file_url === selectedUrl ? "selected" : "") + '>' + (m.media_type === "doc" ? "📄 " : "📸 ") + (m.caption || m.id) + '</option>').join("");
+    document.getElementById("fAvatarSelect").innerHTML = opts;
+    document.getElementById("srcScanSelect").innerHTML = opts;
+  }
+  document.getElementById("addPersonForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const editId = document.getElementById("editPersonId").value;
+    const metaObj = {
+      type: "meta",
+      maiden: document.getElementById("fMaiden").value.trim(),
+      burial: document.getElementById("fBurial").value.trim(),
+      quote: document.getElementById("fQuote").value.trim(),
+      avatar: document.getElementById("fAvatarSelect").value
+    };
+    const hasMeta = metaObj.maiden || metaObj.burial || metaObj.quote || metaObj.avatar;
+
+    if (editId) {
+      const p = persons.find(x => x.id === editId);
+      if (p) {
+        p.name = document.getElementById("fName").value.trim();
+        p.gen = parseInt(document.getElementById("fGen").value, 10);
+        p.branch = document.getElementById("fBranch").value;
+        p.years = document.getElementById("fYears").value.trim();
+        p.location = document.getElementById("fLoc").value.trim();
+        p.bio = document.getElementById("fBio").value.trim();
+        p.archive_note = document.getElementById("fArchive").value.trim();
+        p.stories = (p.stories || []).filter(s => s.type !== "meta");
+        if (hasMeta) p.stories.unshift(metaObj);
+        localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+        try { await sbFetch("persons", "PATCH", p, "?id=eq." + p.id); } catch (err) {}
+        closeModal("addPersonModal"); renderAll(); openPersonCard(p.id); toast("Анкета сохранена!");
+      }
+    } else {
+      const newP = {
+        id: "p_" + Date.now(), gen: parseInt(document.getElementById("fGen").value, 10),
+        branch: document.getElementById("fBranch").value, name: document.getElementById("fName").value.trim(),
+        years: document.getElementById("fYears").value.trim(), location: document.getElementById("fLoc").value.trim(),
+        bio: document.getElementById("fBio").value.trim(), archive_note: document.getElementById("fArchive").value.trim(),
+        stories: hasMeta ? [metaObj] : []
+      };
+      persons.push(newP);
+      localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+      try { await sbFetch("persons", "POST", [newP]); } catch (err) {}
+      closeModal("addPersonModal"); renderAll(); toast("Предок добавлен!");
+    }
+  };
+  document.getElementById("openAddEventBtn").onclick = () => {
+    document.getElementById("eventModalTitle").textContent = "Новая веха в жизни";
+    document.getElementById("evIdx").value = "";
+    document.getElementById("eventForm").reset();
+    document.getElementById("deleteEventBtn").classList.add("hidden");
+    openModal("eventModal");
+  };
+
+  function openEditEvent(idx) {
+    const p = persons.find(x => x.id === activePersonId);
+    if (!p || !p.stories[idx]) return;
+    const ev = p.stories[idx];
+    document.getElementById("eventModalTitle").textContent = "Редактировать веху";
+    document.getElementById("evIdx").value = idx;
+    document.getElementById("evYear").value = ev.year;
+    document.getElementById("evCat").value = ev.cat;
+    document.getElementById("evText").value = ev.text;
+    document.getElementById("deleteEventBtn").classList.remove("hidden");
+    openModal("eventModal");
+  }
+
+  document.getElementById("deleteEventBtn").onclick = async () => {
+    const idx = parseInt(document.getElementById("evIdx").value, 10);
+    const p = persons.find(x => x.id === activePersonId);
+    if (!p || isNaN(idx)) return;
+    p.stories.splice(idx, 1);
+    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+    try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
+    closeModal("eventModal"); renderAll(); openPersonCard(p.id); toast("Веха удалена");
+  };
+
+  document.getElementById("eventForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const p = persons.find(x => x.id === activePersonId);
+    if (!p) return;
+    p.stories = p.stories || [];
+    const idxStr = document.getElementById("evIdx").value;
+    const evObj = { type: "event", year: document.getElementById("evYear").value.trim(), cat: document.getElementById("evCat").value, text: document.getElementById("evText").value.trim() };
+    if (idxStr !== "") p.stories[parseInt(idxStr, 10)] = evObj;
+    else p.stories.push(evObj);
+    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+    try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
+    closeModal("eventModal"); renderAll(); openPersonCard(p.id); toast("Веха сохранена!");
+  };
+  document.getElementById("openAddSourceBtn").onclick = () => {
+    document.getElementById("sourceForm").reset();
+    populateMediaSelects("");
+    openModal("sourceModal");
+  };
+
+  document.getElementById("sourceForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const p = persons.find(x => x.id === activePersonId);
+    if (!p) return;
+    p.stories = p.stories || [];
+    p.stories.push({
+      type: "source",
+      ref: document.getElementById("srcRef").value.trim(),
+      text: document.getElementById("srcText").value.trim(),
+      scanUrl: document.getElementById("srcScanSelect").value
+    });
+    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+    try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
+    closeModal("sourceModal"); renderAll(); openPersonCard(p.id); toast("Источник прикреплён!");
+  };
+
+  function compressImage(file, maxWidth = 1500, quality = 0.82) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -422,47 +674,43 @@
           if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
           canvas.width = w; canvas.height = h;
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          canvas.toBlob((blob) => resolve({ blob, dataUrl: canvas.toDataURL("image/jpeg", quality) }), "image/jpeg", quality);
+          canvas.toBlob((blob) => resolve({ blob: blob, dataUrl: canvas.toDataURL("image/jpeg", quality) }), "image/jpeg", quality);
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
   }
+
   document.getElementById("photoFileInput").onchange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    const prog = document.getElementById("uploadProgress");
-    prog.classList.remove("hidden");
+    const mType = document.getElementById("uploadTypeSelect").value;
+    const prog = document.getElementById("uploadProgress"); prog.classList.remove("hidden");
     for (let i = 0; i < files.length; i++) {
-      prog.textContent = `Сжимаю фото ${i + 1} из ${files.length}...`;
-      const { blob, dataUrl } = await compressImage(files[i]);
-      let finalUrl = dataUrl;
-      const uploadedUrl = await sbUpload(`img_${Date.now()}_${i}.jpg`, blob, "image/jpeg");
+      prog.textContent = "Обработка " + (i + 1) + " из " + files.length + "...";
+      const resImg = await compressImage(files[i]);
+      let finalUrl = resImg.dataUrl;
+      const uploadedUrl = await sbUpload(mType + "_" + Date.now() + "_" + i + ".jpg", resImg.blob, "image/jpeg");
       if (uploadedUrl) finalUrl = uploadedUrl;
-      const newMedia = { id: "m_" + Date.now() + i, file_url: finalUrl, caption: files[i].name.replace(/\.[^/.]+$/, ""), tags: [] };
+      const cleanName = files[i].name.replace(/\.[^/.]+$/, "");
+      const newMedia = { id: "m_" + Date.now() + i, file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] };
       try {
-        const saved = await sbFetch("media", "POST", [{ file_url: finalUrl, caption: newMedia.caption, tags: [] }]);
+        const saved = await sbFetch("media", "POST", [{ file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] }]);
         if (saved && saved[0]) newMedia.id = saved[0].id;
       } catch (err) {}
       mediaList.unshift(newMedia);
     }
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
-    prog.classList.add("hidden");
-    e.target.value = "";
-    renderPhotos();
-    toast(`Загружено: ${files.length} фото`);
+    prog.classList.add("hidden"); e.target.value = ""; renderPhotos(); toast("Загружено: " + files.length);
   };
-
   function renderPhotos() {
-    const grid = document.getElementById("photoGrid");
-    grid.innerHTML = "";
+    const grid = document.getElementById("photoGrid"); grid.innerHTML = "";
     mediaList.forEach(m => {
-      const card = document.createElement("div");
-      card.className = "photo-card";
-      card.onclick = () => openPhotoTagger(m.id);
+      const card = document.createElement("div"); card.className = "photo-card"; card.onclick = () => openPhotoTagger(m.id);
       const count = (m.tags || []).length;
-      card.innerHTML = `<img src="${m.file_url}" loading="lazy"><div class="photo-card-body"><div style="font-weight:500; font-size:0.9rem;">${m.caption || "Без подписи"}</div><div class="photo-tags-count">${count ? `Отмечено лиц: ${count}` : "Ткни, чтобы подписать лица"}</div></div>`;
+      const badge = m.media_type === "doc" ? '<div class="doc-badge">📄 Архивный скан</div>' : '';
+      card.innerHTML = badge + '<img src="' + m.file_url + '" loading="lazy"><div class="photo-card-body"><div style="font-weight:500; font-size:0.9rem;">' + (m.caption || "Без подписи") + '</div><div class="photo-tags-count">' + (count ? ("Отмечено: " + count) : "Ткни, чтобы отметить") + '</div></div>';
       grid.appendChild(card);
     });
   }
@@ -473,18 +721,14 @@
     document.getElementById("taggerImg").src = activePhoto.file_url;
     document.getElementById("photoCaptionInput").value = activePhoto.caption || "";
     document.getElementById("tagPickerBox").classList.add("hidden");
-    renderPhotoPins();
-    openModal("photoModal");
+    renderPhotoPins(); openModal("photoModal");
   }
 
   function renderPhotoPins() {
-    const wrap = document.getElementById("taggerWrap");
-    wrap.querySelectorAll(".face-pin").forEach(el => el.remove());
+    const wrap = document.getElementById("taggerWrap"); wrap.querySelectorAll(".face-pin").forEach(el => el.remove());
     (activePhoto.tags || []).forEach(tag => {
-      const pin = document.createElement("div");
-      pin.className = "face-pin";
-      pin.style.left = tag.x + "%"; pin.style.top = tag.y + "%";
-      pin.textContent = tag.name;
+      const pin = document.createElement("div"); pin.className = "face-pin";
+      pin.style.left = tag.x + "%"; pin.style.top = tag.y + "%"; pin.textContent = tag.name;
       pin.onclick = (e) => { e.stopPropagation(); closeModal("photoModal"); openPersonCard(tag.personId); };
       wrap.appendChild(pin);
     });
@@ -498,33 +742,25 @@
 
   document.getElementById("confirmTagBtn").onclick = async () => {
     if (!activePhoto || !pendingClickCoords) return;
-    const sel = document.getElementById("tagPersonSelect");
-    const personId = sel.value;
-    const personName = sel.options[sel.selectedIndex].text.split(" (")[0];
-    activePhoto.tags = activePhoto.tags || [];
-    activePhoto.tags.push({ x: pendingClickCoords.x, y: pendingClickCoords.y, personId, name: personName });
+    const sel = document.getElementById("tagPersonSelect"), personId = sel.value, personName = sel.options[sel.selectedIndex].text.split(" (")[0];
+    activePhoto.tags = activePhoto.tags || []; activePhoto.tags.push({ x: pendingClickCoords.x, y: pendingClickCoords.y, personId: personId, name: personName });
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
-    try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, `?id=eq.${activePhoto.id}`); } catch (err) {}
-    document.getElementById("tagPickerBox").classList.add("hidden");
-    renderPhotoPins(); renderPhotos();
-    toast(`Отмечен(а): ${personName}`);
+    try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch (err) {}
+    document.getElementById("tagPickerBox").classList.add("hidden"); renderPhotoPins(); renderPhotos(); toast("Отмечен(а): " + personName);
   };
 
   document.getElementById("saveCaptionBtn").onclick = async () => {
     if (!activePhoto) return;
     activePhoto.caption = document.getElementById("photoCaptionInput").value.trim();
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
-    try { await sbFetch("media", "PATCH", { caption: activePhoto.caption }, `?id=eq.${activePhoto.id}`); } catch (err) {}
-    renderPhotos();
-    toast("Подпись сохранена");
+    try { await sbFetch("media", "PATCH", { caption: activePhoto.caption }, "?id=eq." + activePhoto.id); } catch (err) {}
+    renderPhotos(); toast("Подпись сохранена");
   };
 
   document.getElementById("speechToTextBtn").onclick = () => {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) return toast("Используй кнопку «Записать звук»!");
-    const rec = new SpeechRec();
-    rec.lang = "ru-RU";
-    toast("Говорите...");
+    const rec = new SpeechRec(); rec.lang = "ru-RU"; toast("Говорите...");
     rec.onresult = (e) => { const area = document.getElementById("storyTextInput"); area.value = (area.value + " " + e.results[0][0].transcript).trim(); };
     rec.start();
   };
@@ -534,8 +770,7 @@
     if (mediaRecorder && mediaRecorder.state === "recording") { mediaRecorder.stop(); btn.textContent = "🔴 Записать звук"; return; }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      const chunks = [];
+      mediaRecorder = new MediaRecorder(stream); const chunks = [];
       mediaRecorder.ondataavailable = (ev) => chunks.push(ev.data);
       mediaRecorder.onstop = () => {
         recordedAudioBlob = new Blob(chunks, { type: "audio/webm" });
@@ -543,49 +778,42 @@
         document.getElementById("audioPreviewWrap").classList.remove("hidden");
         stream.getTracks().forEach(t => t.stop());
       };
-      mediaRecorder.start();
-      btn.textContent = "⏹ Стоп";
+      mediaRecorder.start(); btn.textContent = "⏹ Стоп";
     } catch (err) { toast("Нет доступа к микрофону"); }
   };
 
   document.getElementById("saveStoryBtn").onclick = async () => {
-    const personId = document.getElementById("storyPersonSelect").value;
-    const text = document.getElementById("storyTextInput").value.trim();
+    const personId = document.getElementById("storyPersonSelect").value, text = document.getElementById("storyTextInput").value.trim();
     if (!text && !recordedAudioBlob) return toast("Добавь текст или звук!");
     let audioUrl = "";
     if (recordedAudioBlob) {
-      const up = await sbUpload(`voice_${Date.now()}.webm`, recordedAudioBlob, "audio/webm");
+      const up = await sbUpload("voice_" + Date.now() + ".webm", recordedAudioBlob, "audio/webm");
       audioUrl = up || document.getElementById("audioPreview").src;
     }
     const person = persons.find(x => x.id === personId);
     if (person) {
       person.stories = person.stories || [];
-      person.stories.unshift({ date: new Date().toLocaleDateString("ru-RU"), text, audioUrl });
+      person.stories.unshift({ date: new Date().toLocaleDateString("ru-RU"), text: text, audioUrl: audioUrl });
       localStorage.setItem("chronicle_persons", JSON.stringify(persons));
-      try { await sbFetch("persons", "PATCH", { stories: person.stories }, `?id=eq.${person.id}`); } catch (err) {}
+      try { await sbFetch("persons", "PATCH", { stories: person.stories }, "?id=eq." + person.id); } catch (err) {}
     }
-    document.getElementById("storyTextInput").value = "";
-    recordedAudioBlob = null;
-    document.getElementById("audioPreviewWrap").classList.add("hidden");
-    renderStories(); renderTree();
-    toast("Сохранено!");
+    document.getElementById("storyTextInput").value = ""; recordedAudioBlob = null;
+    document.getElementById("audioPreviewWrap").classList.add("hidden"); renderStories(); renderTree(); toast("Сохранено!");
   };
 
   function renderStories() {
-    const list = document.getElementById("storiesList");
-    list.innerHTML = "";
+    const list = document.getElementById("storiesList"); list.innerHTML = "";
     persons.forEach(p => {
-      (p.stories || []).forEach(s => {
-        const div = document.createElement("div");
-        div.className = "story-item";
-        div.innerHTML = `<div class="story-header"><strong>${p.name}</strong><span>${s.date}</span></div><div style="font-size:0.92rem;">${s.text}</div>${s.audioUrl ? `<audio controls src="${s.audioUrl}"></audio>` : ""}`;
+      (p.stories || []).filter(s => !s.type).forEach(s => {
+        const div = document.createElement("div"); div.className = "story-item";
+        div.innerHTML = '<div class="story-header"><strong>' + p.name + '</strong><span>' + (s.date || "") + '</span></div><div style="font-size:0.92rem;">' + (s.text || "") + '</div>' + (s.audioUrl ? '<audio controls src="' + s.audioUrl + '"></audio>' : '');
         list.appendChild(div);
       });
     });
   }
 
   function populateSelects() {
-    const opts = persons.map(p => `<option value="${p.id}">${p.name} (${p.gen}-е колено)</option>`).join("");
+    const opts = persons.map(p => '<option value="' + p.id + '">' + p.name + ' (' + p.gen + '-е колено)</option>').join("");
     document.getElementById("tagPersonSelect").innerHTML = opts;
     document.getElementById("storyPersonSelect").innerHTML = opts;
   }
@@ -595,24 +823,16 @@
   document.querySelectorAll(".pill").forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll(".pill").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentFilter = btn.dataset.filter;
-      renderTree();
+      btn.classList.add("active"); currentFilter = btn.dataset.filter; renderTree();
     };
   });
-
   document.getElementById("exportBackupBtn").onclick = () => {
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([JSON.stringify({ persons, media: mediaList }, null, 2)], { type: "application/json" }));
-    a.download = "family_backup.json";
-    a.click();
+    a.href = URL.createObjectURL(new Blob([JSON.stringify({ persons: persons, media: mediaList }, null, 2)], { type: "application/json" }));
+    a.download = "family_backup.json"; a.click();
   };
 
-  renderAll();
-  initCloud();
+  renderAll(); initCloud();
 </script>
 </body>
 </html>
-
-
-    
