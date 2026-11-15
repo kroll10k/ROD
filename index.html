@@ -157,6 +157,7 @@
     <div id="storiesList"></div>
   </section>
 </div>
+
 <div class="backdrop" id="personModal">
   <div class="modal">
     <div class="modal-head">
@@ -170,47 +171,31 @@
       </div>
       <button class="close-btn" onclick="closeModal('personModal')">&times;</button>
     </div>
-
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
       <button class="btn btn-sm" id="editPersonBtn">✏️ Анкета</button>
       <button class="btn btn-primary btn-sm" id="openAddEventBtn">＋ Веха жизни</button>
       <button class="btn btn-sm" id="openAddSourceBtn">📜 Источник НИАБ</button>
     </div>
-
     <div id="mQuoteBlock" class="hidden" style="font-family:Georgia,serif; font-style:italic; color:var(--gold); background:var(--gold-dim); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:0.95rem;"></div>
-
     <div class="field"><div class="label">О человеке</div><div id="mBio" style="font-size:0.95rem; white-space:pre-line;"></div></div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
       <div><div class="label">География</div><div id="mLoc" style="color:var(--muted); font-size:0.88rem;"></div></div>
       <div id="mBurialBlock" class="hidden"><div class="label">Память / Захоронение</div><div id="mBurial" style="color:var(--muted); font-size:0.88rem;"></div></div>
     </div>
-
-    <div class="field">
-      <div class="label">Жизненный путь (учёба, работа, события)</div>
-      <div id="mTimeline" class="timeline"></div>
-    </div>
-
+    <div class="field"><div class="label">Жизненный путь (учёба, работа, события)</div><div id="mTimeline" class="timeline"></div></div>
     <div class="field">
       <div class="label">Архивные источники, ревизии и документы</div>
       <div id="mSourcesList"></div>
       <div id="mArchiveLegacy" class="source-card hidden"><div class="source-ref">Архивная заметка</div><div id="mArchive"></div></div>
     </div>
-
-    <div class="field" id="mPhotosBlock" class="hidden">
-      <div class="label">Фотографии и сканы с привязкой</div>
-      <div id="mPhotos" class="mini-gallery"></div>
-    </div>
-
+    <div class="field" id="mPhotosBlock" class="hidden"><div class="label">Фотографии и сканы с привязкой</div><div id="mPhotos" class="mini-gallery"></div></div>
     <div class="field" id="mStoriesBlock"><div class="label">Записанные голосом воспоминания</div><div id="mStories"></div></div>
   </div>
 </div>
 
 <div class="backdrop" id="eventModal">
   <div class="modal">
-    <div class="modal-head">
-      <h3 id="eventModalTitle">Новая веха в жизни</h3>
-      <button class="close-btn" onclick="closeModal('eventModal')">&times;</button>
-    </div>
+    <div class="modal-head"><h3 id="eventModalTitle">Новая веха в жизни</h3><button class="close-btn" onclick="closeModal('eventModal')">&times;</button></div>
     <form id="eventForm">
       <input type="hidden" id="evIdx">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -218,12 +203,9 @@
         <div class="field">
           <label class="label">Категория</label>
           <select id="evCat">
-            <option value="🎓 Учёба">🎓 Учёба</option>
-            <option value="💼 Работа и дело">💼 Работа и дело</option>
-            <option value="🏠 Переезд / Дом">🏠 Переезд / Дом</option>
-            <option value="💍 Семья">💍 Семья</option>
-            <option value="🎖 Подвиг / Награда">🎖 Подвиг / Награда</option>
-            <option value="✨ Важная веха">✨ Важная веха</option>
+            <option value="🎓 Учёба">🎓 Учёба</option><option value="💼 Работа и дело">💼 Работа и дело</option>
+            <option value="🏠 Переезд / Дом">🏠 Переезд / Дом</option><option value="💍 Семья">💍 Семья</option>
+            <option value="🎖 Подвиг / Награда">🎖 Подвиг / Награда</option><option value="✨ Важная веха">✨ Важная веха</option>
           </select>
         </div>
       </div>
@@ -235,13 +217,9 @@
     </form>
   </div>
 </div>
-
 <div class="backdrop" id="sourceModal">
   <div class="modal">
-    <div class="modal-head">
-      <h3>Прикрепить архивный источник</h3>
-      <button class="close-btn" onclick="closeModal('sourceModal')">&times;</button>
-    </div>
+    <div class="modal-head"><h3>Прикрепить архивный источник</h3><button class="close-btn" onclick="closeModal('sourceModal')">&times;</button></div>
     <form id="sourceForm">
       <div class="field"><label class="label">Шифр архива / Источник *</label><input type="text" id="srcRef" required placeholder="НИАБ Ф.333 Оп.9 Д.123 Л.45 (Ревизия 1858 г.)"></div>
       <div class="field"><label class="label">Выписка / Расшифровка факта *</label><textarea id="srcText" rows="3" required placeholder="Что именно написано в документе про двор, возраст, состав семьи..."></textarea></div>
@@ -275,10 +253,7 @@
 
 <div class="backdrop" id="addPersonModal">
   <div class="modal">
-    <div class="modal-head">
-      <h3 id="personFormTitle">Добавить родственника</h3>
-      <button class="close-btn" onclick="closeModal('addPersonModal')">&times;</button>
-    </div>
+    <div class="modal-head"><h3 id="personFormTitle">Добавить родственника</h3><button class="close-btn" onclick="closeModal('addPersonModal')">&times;</button></div>
     <form id="addPersonForm">
       <input type="hidden" id="editPersonId">
       <div class="field"><label class="label">ФИО полностью *</label><input type="text" id="fName" required placeholder="Фамилия Имя Отчество"></div>
@@ -317,12 +292,17 @@
 
 <div class="backdrop" id="cloudModal">
   <div class="modal">
-    <div class="modal-head">
-      <h3>Облако Supabase и ссылка для родни</h3>
-      <button class="close-btn" onclick="closeModal('cloudModal')">&times;</button>
-    </div>
+    <div class="modal-head"><h3>Облако Supabase и ссылка для родни</h3><button class="close-btn" onclick="closeModal('cloudModal')">&times;</button></div>
     <p style="font-size:0.86rem; color:var(--muted); margin-bottom:14px;">Вставь ключи один раз. После подключения нажми «🔗 Родне» в шапке — скопируется ссылка, по которой у жены и родных всё подключится само.</p>
     <div class="field"><label class="label">Project URL</label><input type="text" id="sbUrlInput" placeholder="https://supabase.co"></div>
+    <div class="field"><label class="label">anon public key</label><input type="text" id="sbKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..."></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-primary" id="saveCloudBtn">Подключить</button>
+      <button class="btn" id="exportBackupBtn">⬇ Скачать JSON</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Готово</div>
 <script>
   const SEED_PERSONS = [
     { id: "daughter", gen: 1, branch: "union", name: "Дочка", years: "1-е колено", location: "Мончегорск / Беларусь", bio: "Объединение родов Николая и Елены.", archive_note: "", stories: [] },
@@ -354,9 +334,7 @@
 
   let persons = JSON.parse(localStorage.getItem("chronicle_persons")) || SEED_PERSONS;
   let mediaList = JSON.parse(localStorage.getItem("chronicle_media")) || [];
-  let currentFilter = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null, recordedAudioBlob = null, mediaRecorder = null;
-
-  function toast(msg) { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600); }
+  let currentFilte  function toast(msg) { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600); }
   function openModal(id) { document.getElementById(id).classList.add("open"); }
   function closeModal(id) { document.getElementById(id).classList.remove("open"); }
   function getMeta(p) { return (p.stories || []).find(s => s.type === "meta") || {}; }
@@ -422,6 +400,7 @@
       document.getElementById(btn.dataset.tab).classList.remove("hidden");
     };
   });
+r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null, recordedAudioBlob = null, mediaRecorder = null;
   function renderTree() {
     const container = document.getElementById("treeContainer"), q = document.getElementById("searchInput").value.toLowerCase().trim();
     container.innerHTML = "";
@@ -519,7 +498,6 @@
     } else { stBlock.style.display = "none"; }
     openModal("personModal");
   }
-
   function openPhotoByUrl(url) { const m = mediaList.find(x => x.file_url === url); if (m) openPhotoTagger(m.id); }
 
   function openAddPerson() {
@@ -555,6 +533,7 @@
     document.getElementById("fAvatarSelect").innerHTML = opts;
     document.getElementById("srcScanSelect").innerHTML = opts;
   }
+
   document.getElementById("addPersonForm").onsubmit = async (e) => {
     e.preventDefault();
     const editId = document.getElementById("editPersonId").value;
@@ -566,7 +545,6 @@
       avatar: document.getElementById("fAvatarSelect").value
     };
     const hasMeta = metaObj.maiden || metaObj.burial || metaObj.quote || metaObj.avatar;
-
     if (editId) {
       const p = persons.find(x => x.id === editId);
       if (p) {
@@ -597,12 +575,11 @@
       closeModal("addPersonModal"); renderAll(); toast("Предок добавлен!");
     }
   };
+
   document.getElementById("openAddEventBtn").onclick = () => {
     document.getElementById("eventModalTitle").textContent = "Новая веха в жизни";
-    document.getElementById("evIdx").value = "";
-    document.getElementById("eventForm").reset();
-    document.getElementById("deleteEventBtn").classList.add("hidden");
-    openModal("eventModal");
+    document.getElementById("evIdx").value = ""; document.getElementById("eventForm").reset();
+    document.getElementById("deleteEventBtn").classList.add("hidden"); openModal("eventModal");
   };
 
   function openEditEvent(idx) {
@@ -610,20 +587,15 @@
     if (!p || !p.stories[idx]) return;
     const ev = p.stories[idx];
     document.getElementById("eventModalTitle").textContent = "Редактировать веху";
-    document.getElementById("evIdx").value = idx;
-    document.getElementById("evYear").value = ev.year;
-    document.getElementById("evCat").value = ev.cat;
-    document.getElementById("evText").value = ev.text;
-    document.getElementById("deleteEventBtn").classList.remove("hidden");
-    openModal("eventModal");
+    document.getElementById("evIdx").value = idx; document.getElementById("evYear").value = ev.year;
+    document.getElementById("evCat").value = ev.cat; document.getElementById("evText").value = ev.text;
+    document.getElementById("deleteEventBtn").classList.remove("hidden"); openModal("eventModal");
   }
 
   document.getElementById("deleteEventBtn").onclick = async () => {
-    const idx = parseInt(document.getElementById("evIdx").value, 10);
-    const p = persons.find(x => x.id === activePersonId);
+    const idx = parseInt(document.getElementById("evIdx").value, 10), p = persons.find(x => x.id === activePersonId);
     if (!p || isNaN(idx)) return;
-    p.stories.splice(idx, 1);
-    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+    p.stories.splice(idx, 1); localStorage.setItem("chronicle_persons", JSON.stringify(persons));
     try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
     closeModal("eventModal"); renderAll(); openPersonCard(p.id); toast("Веха удалена");
   };
@@ -635,34 +607,23 @@
     p.stories = p.stories || [];
     const idxStr = document.getElementById("evIdx").value;
     const evObj = { type: "event", year: document.getElementById("evYear").value.trim(), cat: document.getElementById("evCat").value, text: document.getElementById("evText").value.trim() };
-    if (idxStr !== "") p.stories[parseInt(idxStr, 10)] = evObj;
-    else p.stories.push(evObj);
+    if (idxStr !== "") p.stories[parseInt(idxStr, 10)] = evObj; else p.stories.push(evObj);
     localStorage.setItem("chronicle_persons", JSON.stringify(persons));
     try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
     closeModal("eventModal"); renderAll(); openPersonCard(p.id); toast("Веха сохранена!");
   };
-  document.getElementById("openAddSourceBtn").onclick = () => {
-    document.getElementById("sourceForm").reset();
-    populateMediaSelects("");
-    openModal("sourceModal");
-  };
 
+  document.getElementById("openAddSourceBtn").onclick = () => { document.getElementById("sourceForm").reset(); populateMediaSelects(""); openModal("sourceModal"); };
   document.getElementById("sourceForm").onsubmit = async (e) => {
     e.preventDefault();
     const p = persons.find(x => x.id === activePersonId);
     if (!p) return;
     p.stories = p.stories || [];
-    p.stories.push({
-      type: "source",
-      ref: document.getElementById("srcRef").value.trim(),
-      text: document.getElementById("srcText").value.trim(),
-      scanUrl: document.getElementById("srcScanSelect").value
-    });
+    p.stories.push({ type: "source", ref: document.getElementById("srcRef").value.trim(), text: document.getElementById("srcText").value.trim(), scanUrl: document.getElementById("srcScanSelect").value });
     localStorage.setItem("chronicle_persons", JSON.stringify(persons));
     try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
     closeModal("sourceModal"); renderAll(); openPersonCard(p.id); toast("Источник прикреплён!");
   };
-
   function compressImage(file, maxWidth = 1500, quality = 0.82) {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -685,15 +646,14 @@
   document.getElementById("photoFileInput").onchange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    const mType = document.getElementById("uploadTypeSelect").value;
-    const prog = document.getElementById("uploadProgress"); prog.classList.remove("hidden");
+    const mType = document.getElementById("uploadTypeSelect").value, prog = document.getElementById("uploadProgress"); prog.classList.remove("hidden");
     for (let i = 0; i < files.length; i++) {
       prog.textContent = "Обработка " + (i + 1) + " из " + files.length + "...";
       const resImg = await compressImage(files[i]);
       let finalUrl = resImg.dataUrl;
       const uploadedUrl = await sbUpload(mType + "_" + Date.now() + "_" + i + ".jpg", resImg.blob, "image/jpeg");
       if (uploadedUrl) finalUrl = uploadedUrl;
-      const cleanName = files[i].name.replace(/\.[^/.]+$/, "");
+      const cleanName = files[i].name.replace(/\.[^/.]+\$/, "");
       const newMedia = { id: "m_" + Date.now() + i, file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] };
       try {
         const saved = await sbFetch("media", "POST", [{ file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] }]);
@@ -704,12 +664,12 @@
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
     prog.classList.add("hidden"); e.target.value = ""; renderPhotos(); toast("Загружено: " + files.length);
   };
+
   function renderPhotos() {
     const grid = document.getElementById("photoGrid"); grid.innerHTML = "";
     mediaList.forEach(m => {
       const card = document.createElement("div"); card.className = "photo-card"; card.onclick = () => openPhotoTagger(m.id);
-      const count = (m.tags || []).length;
-      const badge = m.media_type === "doc" ? '<div class="doc-badge">📄 Архивный скан</div>' : '';
+      const count = (m.tags || []).length, badge = m.media_type === "doc" ? '<div class="doc-badge">📄 Архивный скан</div>' : '';
       card.innerHTML = badge + '<img src="' + m.file_url + '" loading="lazy"><div class="photo-card-body"><div style="font-weight:500; font-size:0.9rem;">' + (m.caption || "Без подписи") + '</div><div class="photo-tags-count">' + (count ? ("Отмечено: " + count) : "Ткни, чтобы отметить") + '</div></div>';
       grid.appendChild(card);
     });
@@ -718,10 +678,8 @@
   function openPhotoTagger(mediaId) {
     activePhoto = mediaList.find(x => x.id === mediaId);
     if (!activePhoto) return;
-    document.getElementById("taggerImg").src = activePhoto.file_url;
-    document.getElementById("photoCaptionInput").value = activePhoto.caption || "";
-    document.getElementById("tagPickerBox").classList.add("hidden");
-    renderPhotoPins(); openModal("photoModal");
+    document.getElementById("taggerImg").src = activePhoto.file_url; document.getElementById("photoCaptionInput").value = activePhoto.caption || "";
+    document.getElementById("tagPickerBox").classList.add("hidden"); renderPhotoPins(); openModal("photoModal");
   }
 
   function renderPhotoPins() {
@@ -733,7 +691,6 @@
       wrap.appendChild(pin);
     });
   }
-
   document.getElementById("taggerWrap").onclick = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     pendingClickCoords = { x: Math.round(((e.clientX - rect.left) / rect.width) * 100), y: Math.round(((e.clientY - rect.top) / rect.height) * 100) };
@@ -814,8 +771,7 @@
 
   function populateSelects() {
     const opts = persons.map(p => '<option value="' + p.id + '">' + p.name + ' (' + p.gen + '-е колено)</option>').join("");
-    document.getElementById("tagPersonSelect").innerHTML = opts;
-    document.getElementById("storyPersonSelect").innerHTML = opts;
+    document.getElementById("tagPersonSelect").innerHTML = opts; document.getElementById("storyPersonSelect").innerHTML = opts;
   }
 
   function renderAll() { populateSelects(); renderTree(); renderPhotos(); renderStories(); }
