@@ -663,7 +663,8 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       } catch (err) {}
       mediaList.unshift(newMedia);
     }
-    localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
+    try { localStorage.setItem("chronicle_media", JSON.stringify(mediaList)); } catch (err) {}
+
     prog.classList.add("hidden");
     e.target.value = "";
     renderPhotos();
