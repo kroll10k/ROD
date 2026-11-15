@@ -334,7 +334,13 @@
 
   let persons = JSON.parse(localStorage.getItem("chronicle_persons")) || SEED_PERSONS;
   let mediaList = JSON.parse(localStorage.getItem("chronicle_media")) || [];
-  let currentFilte  function toast(msg) { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600); }
+    let currentFilter = "all";
+  let activePersonId = null;
+  let activePhoto = null;
+  let pendingClickCoords = null;
+  let recordedAudioBlob = null;
+  let mediaRecorder = null;
+  function toast(msg) { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600); }
   function openModal(id) { document.getElementById(id).classList.add("open"); }
   function closeModal(id) { document.getElementById(id).classList.remove("open"); }
   function getMeta(p) { return (p.stories || []).find(s => s.type === "meta") || {}; }
