@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <script src="https://unpkg.com"></script>
+      <script src="https://jsdelivr.net"></script>
+
 
 <head>
   <meta charset="UTF-8">
@@ -1024,13 +1025,13 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       if (params.nodes.length > 0) openPersonCard(params.nodes);
     });
   }
-  function renderSvgBlueprint() {
+    function renderSvgBlueprint() {
     const wrap = document.getElementById("svgSchemaWrap");
     const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => b - a);
-    const boxW = 190, boxH = 56, gapX = 24, gapY = 85;
+    const boxW = 250, boxH = 58, gapX = 24, gapY = 85;
     let maxCols = 1;
     gens.forEach(g => { const c = persons.filter(p => p.gen === g).length; if (c > maxCols) maxCols = c; });
-    const width = Math.max(600, maxCols * (boxW + gapX) + 40);
+    const width = Math.max(650, maxCols * (boxW + gapX) + 60);
     const height = gens.length * (boxH + gapY) + 60;
     const coords = {};
     let svgBody = "";
@@ -1038,17 +1039,17 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     gens.forEach((g, rIdx) => {
       const rowPersons = persons.filter(p => p.gen === g);
       const rowW = rowPersons.length * (boxW + gapX) - gapX;
-      const startX = (width - rowW) / 2;
-      const y = 30 + rIdx * (boxH + gapY);
-      svgBody += '<text x="14" y="' + (y - 8) + '" fill="#64748b" font-size="11" font-family="sans-serif">' + g + '-Е КОЛЕНО</text>';
+      const startX = Math.max(24, (width - rowW) / 2);
+      const y = 34 + rIdx * (boxH + gapY);
+      svgBody += '<text x="24" y="' + (y - 10) + '" fill="#9ca3af" font-size="11" font-weight="bold" font-family="sans-serif">' + g + '-Е КОЛЕНО</text>';
       rowPersons.forEach((p, cIdx) => {
         const x = startX + cIdx * (boxW + gapX);
         coords[p.id] = { x: x + boxW / 2, top: y, bottom: y + boxH, left: x, right: x + boxW, midY: y + boxH / 2 };
         const stroke = p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : "#d4af37"));
         svgBody += '<g style="cursor:pointer" onclick="openPersonCard(\'' + p.id + '\')">';
         svgBody += '<rect x="' + x + '" y="' + y + '" width="' + boxW + '" height="' + boxH + '" rx="8" fill="#181c24" stroke="' + stroke + '" stroke-width="2"/>';
-        svgBody += '<text x="' + (x + 10) + '" y="' + (y + 23) + '" fill="#f3f4f6" font-size="12" font-weight="bold" font-family="sans-serif">' + p.name.slice(0, 24) + '</text>';
-        svgBody += '<text x="' + (x + 10) + '" y="' + (y + 42) + '" fill="#9ca3af" font-size="10" font-family="sans-serif">' + (p.years || "").slice(0, 26) + '</text>';
+        svgBody += '<text x="' + (x + 12) + '" y="' + (y + 24) + '" fill="#f3f4f6" font-size="11.5" font-weight="bold" font-family="sans-serif">' + p.name + '</text>';
+        svgBody += '<text x="' + (x + 12) + '" y="' + (y + 44) + '" fill="#9ca3af" font-size="10" font-family="sans-serif">' + (p.years || "") + '</text>';
         svgBody += '</g>';
       });
     });
@@ -1071,6 +1072,7 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
 
     wrap.innerHTML = '<svg id="familySvgEl" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#0d1015;">' + lines + svgBody + '</svg>';
   }
+
 
   function downloadSchemaFile() {
     if (schemaMode === "svg") {
