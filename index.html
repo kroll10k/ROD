@@ -643,33 +643,38 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     });
   }
 
-  document.getElementById("photoFileInput").onchange = async (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
-    const mType = document.getElementById("uploadTypeSelect").value;
-    const prog = document.getElementById("uploadProgress");
-    prog.classList.remove("hidden");
-    for (let i = 0; i < files.length; i++) {
-      prog.textContent = "Обработка " + (i + 1) + " из " + files.length + "...";
-      const resImg = await compressImage(files[i]);
-      let finalUrl = resImg.dataUrl;
-      const uploadedUrl = await sbUpload(mType + "_" + Date.now() + "_" + i + ".jpg", resImg.blob, "image/jpeg");
-      if (uploadedUrl) finalUrl = uploadedUrl;
-      const cleanName = files[i].name;
-      const newMedia = { id: "m_" + Date.now() + i, file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] };
-      try {
+    document.getElementById("photoFileInput").onchange = async (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      const mType = document.getElementById("uploadTypeSelect").value;
+      const prog = document.getElementById("uploadProgress");
+      prog.classList.remove("hidden");
+      for (let i = 0; i < files.length; i++) {
+        prog.textContent = "Шаг 1: Сжатие " + (i + 1) + "...";
+        const resImg = await compressImage(files[i]);
+        prog.textContent = "Шаг 2: Отправка в облако...";
+        let finalUrl = resImg.dataUrl;
+        const uploadedUrl = await sbUpload(mType + "_" + Date.now() + "_" + i + ".jpg", resImg.blob, "image/jpeg");
+        if (uploadedUrl) finalUrl = uploadedUrl;
+        else alert("Облако не приняло файл, сохраняю локально");
+        prog.textContent = "Шаг 3: Запись в базу...";
+        const cleanName = files[i].name;
+        const newMedia = { id: "m_" + Date.now() + i, file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] };
         const saved = await sbFetch("media", "POST", [{ file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] }]);
         if (saved && saved[0]) newMedia.id = saved[0].id;
-      } catch (err) {}
-      mediaList.unshift(newMedia);
+        mediaList.unshift(newMedia);
+      }
+      try { localStorage.setItem("chronicle_media", JSON.stringify(mediaList)); } catch (err) {}
+      prog.classList.add("hidden");
+      e.target.value = "";
+      renderPhotos();
+      toast("Готово!");
+    } catch (err) {
+      alert("Ошибка: " + err.message);
     }
-    try { localStorage.setItem("chronicle_media", JSON.stringify(mediaList)); } catch (err) {}
-
-    prog.classList.add("hidden");
-    e.target.value = "";
-    renderPhotos();
-    toast("Загружено: " + files.length);
   };
+
 
   function renderPhotos() {
     const grid = document.getElementById("photoGrid");
