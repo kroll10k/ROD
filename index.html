@@ -642,18 +642,19 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       reader.readAsDataURL(file);
     });
   }
-
   document.getElementById("photoFileInput").onchange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    const mType = document.getElementById("uploadTypeSelect").value, prog = document.getElementById("uploadProgress"); prog.classList.remove("hidden");
+    const mType = document.getElementById("uploadTypeSelect").value;
+    const prog = document.getElementById("uploadProgress");
+    prog.classList.remove("hidden");
     for (let i = 0; i < files.length; i++) {
       prog.textContent = "Обработка " + (i + 1) + " из " + files.length + "...";
       const resImg = await compressImage(files[i]);
       let finalUrl = resImg.dataUrl;
       const uploadedUrl = await sbUpload(mType + "_" + Date.now() + "_" + i + ".jpg", resImg.blob, "image/jpeg");
       if (uploadedUrl) finalUrl = uploadedUrl;
-      const cleanName = files[i].name.replace(/\.[^/.]+\$/, "");
+      const cleanName = files[i].name;
       const newMedia = { id: "m_" + Date.now() + i, file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] };
       try {
         const saved = await sbFetch("media", "POST", [{ file_url: finalUrl, media_type: mType, caption: cleanName, tags: [] }]);
@@ -662,14 +663,21 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       mediaList.unshift(newMedia);
     }
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
-    prog.classList.add("hidden"); e.target.value = ""; renderPhotos(); toast("Загружено: " + files.length);
+    prog.classList.add("hidden");
+    e.target.value = "";
+    renderPhotos();
+    toast("Загружено: " + files.length);
   };
 
   function renderPhotos() {
-    const grid = document.getElementById("photoGrid"); grid.innerHTML = "";
+    const grid = document.getElementById("photoGrid");
+    grid.innerHTML = "";
     mediaList.forEach(m => {
-      const card = document.createElement("div"); card.className = "photo-card"; card.onclick = () => openPhotoTagger(m.id);
-      const count = (m.tags || []).length, badge = m.media_type === "doc" ? '<div class="doc-badge">📄 Архивный скан</div>' : '';
+      const card = document.createElement("div");
+      card.className = "photo-card";
+      card.onclick = () => openPhotoTagger(m.id);
+      const count = (m.tags || []).length;
+      const badge = m.media_type === "doc" ? '<div class="doc-badge">📄 Архивный скан</div>' : '';
       card.innerHTML = badge + '<img src="' + m.file_url + '" loading="lazy"><div class="photo-card-body"><div style="font-weight:500; font-size:0.9rem;">' + (m.caption || "Без подписи") + '</div><div class="photo-tags-count">' + (count ? ("Отмечено: " + count) : "Ткни, чтобы отметить") + '</div></div>';
       grid.appendChild(card);
     });
@@ -678,15 +686,22 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
   function openPhotoTagger(mediaId) {
     activePhoto = mediaList.find(x => x.id === mediaId);
     if (!activePhoto) return;
-    document.getElementById("taggerImg").src = activePhoto.file_url; document.getElementById("photoCaptionInput").value = activePhoto.caption || "";
-    document.getElementById("tagPickerBox").classList.add("hidden"); renderPhotoPins(); openModal("photoModal");
+    document.getElementById("taggerImg").src = activePhoto.file_url;
+    document.getElementById("photoCaptionInput").value = activePhoto.caption || "";
+    document.getElementById("tagPickerBox").classList.add("hidden");
+    renderPhotoPins();
+    openModal("photoModal");
   }
 
   function renderPhotoPins() {
-    const wrap = document.getElementById("taggerWrap"); wrap.querySelectorAll(".face-pin").forEach(el => el.remove());
+    const wrap = document.getElementById("taggerWrap");
+    wrap.querySelectorAll(".face-pin").forEach(el => el.remove());
     (activePhoto.tags || []).forEach(tag => {
-      const pin = document.createElement("div"); pin.className = "face-pin";
-      pin.style.left = tag.x + "%"; pin.style.top = tag.y + "%"; pin.textContent = tag.name;
+      const pin = document.createElement("div");
+      pin.className = "face-pin";
+      pin.style.left = tag.x + "%";
+      pin.style.top = tag.y + "%";
+      pin.textContent = tag.name;
       pin.onclick = (e) => { e.stopPropagation(); closeModal("photoModal"); openPersonCard(tag.personId); };
       wrap.appendChild(pin);
     });
@@ -699,11 +714,17 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
 
   document.getElementById("confirmTagBtn").onclick = async () => {
     if (!activePhoto || !pendingClickCoords) return;
-    const sel = document.getElementById("tagPersonSelect"), personId = sel.value, personName = sel.options[sel.selectedIndex].text.split(" (")[0];
-    activePhoto.tags = activePhoto.tags || []; activePhoto.tags.push({ x: pendingClickCoords.x, y: pendingClickCoords.y, personId: personId, name: personName });
+    const sel = document.getElementById("tagPersonSelect");
+    const personId = sel.value;
+    const personName = sel.options[sel.selectedIndex].text.split(" (")[0];
+    activePhoto.tags = activePhoto.tags || [];
+    activePhoto.tags.push({ x: pendingClickCoords.x, y: pendingClickCoords.y, personId: personId, name: personName });
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
     try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch (err) {}
-    document.getElementById("tagPickerBox").classList.add("hidden"); renderPhotoPins(); renderPhotos(); toast("Отмечен(а): " + personName);
+    document.getElementById("tagPickerBox").classList.add("hidden");
+    renderPhotoPins();
+    renderPhotos();
+    toast("Отмечен(а): " + personName);
   };
 
   document.getElementById("saveCaptionBtn").onclick = async () => {
@@ -711,23 +732,34 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     activePhoto.caption = document.getElementById("photoCaptionInput").value.trim();
     localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
     try { await sbFetch("media", "PATCH", { caption: activePhoto.caption }, "?id=eq." + activePhoto.id); } catch (err) {}
-    renderPhotos(); toast("Подпись сохранена");
+    renderPhotos();
+    toast("Подпись сохранена");
   };
 
   document.getElementById("speechToTextBtn").onclick = () => {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) return toast("Используй кнопку «Записать звук»!");
-    const rec = new SpeechRec(); rec.lang = "ru-RU"; toast("Говорите...");
-    rec.onresult = (e) => { const area = document.getElementById("storyTextInput"); area.value = (area.value + " " + e.results[0][0].transcript).trim(); };
+    const rec = new SpeechRec();
+    rec.lang = "ru-RU";
+    toast("Говорите...");
+    rec.onresult = (e) => {
+      const area = document.getElementById("storyTextInput");
+      area.value = (area.value + " " + e.results[0][0].transcript).trim();
+    };
     rec.start();
   };
 
   document.getElementById("recordAudioBtn").onclick = async (e) => {
     const btn = e.target;
-    if (mediaRecorder && mediaRecorder.state === "recording") { mediaRecorder.stop(); btn.textContent = "🔴 Записать звук"; return; }
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+      btn.textContent = "🔴 Записать звук";
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream); const chunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      const chunks = [];
       mediaRecorder.ondataavailable = (ev) => chunks.push(ev.data);
       mediaRecorder.onstop = () => {
         recordedAudioBlob = new Blob(chunks, { type: "audio/webm" });
@@ -735,12 +767,14 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
         document.getElementById("audioPreviewWrap").classList.remove("hidden");
         stream.getTracks().forEach(t => t.stop());
       };
-      mediaRecorder.start(); btn.textContent = "⏹ Стоп";
+      mediaRecorder.start();
+      btn.textContent = "⏹ Стоп";
     } catch (err) { toast("Нет доступа к микрофону"); }
   };
 
   document.getElementById("saveStoryBtn").onclick = async () => {
-    const personId = document.getElementById("storyPersonSelect").value, text = document.getElementById("storyTextInput").value.trim();
+    const personId = document.getElementById("storyPersonSelect").value;
+    const text = document.getElementById("storyTextInput").value.trim();
     if (!text && !recordedAudioBlob) return toast("Добавь текст или звук!");
     let audioUrl = "";
     if (recordedAudioBlob) {
@@ -754,15 +788,21 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       localStorage.setItem("chronicle_persons", JSON.stringify(persons));
       try { await sbFetch("persons", "PATCH", { stories: person.stories }, "?id=eq." + person.id); } catch (err) {}
     }
-    document.getElementById("storyTextInput").value = ""; recordedAudioBlob = null;
-    document.getElementById("audioPreviewWrap").classList.add("hidden"); renderStories(); renderTree(); toast("Сохранено!");
+    document.getElementById("storyTextInput").value = "";
+    recordedAudioBlob = null;
+    document.getElementById("audioPreviewWrap").classList.add("hidden");
+    renderStories();
+    renderTree();
+    toast("Сохранено!");
   };
 
   function renderStories() {
-    const list = document.getElementById("storiesList"); list.innerHTML = "";
+    const list = document.getElementById("storiesList");
+    list.innerHTML = "";
     persons.forEach(p => {
       (p.stories || []).filter(s => !s.type).forEach(s => {
-        const div = document.createElement("div"); div.className = "story-item";
+        const div = document.createElement("div");
+        div.className = "story-item";
         div.innerHTML = '<div class="story-header"><strong>' + p.name + '</strong><span>' + (s.date || "") + '</span></div><div style="font-size:0.92rem;">' + (s.text || "") + '</div>' + (s.audioUrl ? '<audio controls src="' + s.audioUrl + '"></audio>' : '');
         list.appendChild(div);
       });
@@ -771,7 +811,8 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
 
   function populateSelects() {
     const opts = persons.map(p => '<option value="' + p.id + '">' + p.name + ' (' + p.gen + '-е колено)</option>').join("");
-    document.getElementById("tagPersonSelect").innerHTML = opts; document.getElementById("storyPersonSelect").innerHTML = opts;
+    document.getElementById("tagPersonSelect").innerHTML = opts;
+    document.getElementById("storyPersonSelect").innerHTML = opts;
   }
 
   function renderAll() { populateSelects(); renderTree(); renderPhotos(); renderStories(); }
@@ -779,16 +820,22 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
   document.querySelectorAll(".pill").forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll(".pill").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active"); currentFilter = btn.dataset.filter; renderTree();
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      renderTree();
     };
   });
   document.getElementById("exportBackupBtn").onclick = () => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([JSON.stringify({ persons: persons, media: mediaList }, null, 2)], { type: "application/json" }));
-    a.download = "family_backup.json"; a.click();
+    a.download = "family_backup.json";
+    a.click();
   };
 
-  renderAll(); initCloud();
+  renderAll();
+  initCloud();
 </script>
 </body>
 </html>
+
+  
