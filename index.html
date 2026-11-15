@@ -630,24 +630,19 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
     closeModal("sourceModal"); renderAll(); openPersonCard(p.id); toast("Источник прикреплён!");
   };
-  function compressImage(file, maxWidth = 1500, quality = 0.82) {
+    async function compressImage(file, maxWidth = 1200, quality = 0.8) {
+    const bmp = await createImageBitmap(file);
+    let w = bmp.width, h = bmp.height;
+    if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    canvas.getContext("2d").drawImage(bmp, 0, 0, w, h);
+    bmp.close();
     return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let w = img.width, h = img.height;
-          if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          canvas.toBlob((blob) => resolve({ blob: blob, dataUrl: canvas.toDataURL("image/jpeg", quality) }), "image/jpeg", quality);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      canvas.toBlob((blob) => resolve({ blob: blob, dataUrl: canvas.toDataURL("image/jpeg", quality) }), "image/jpeg", quality);
     });
   }
+
   document.getElementById("photoFileInput").onchange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
