@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
+    <script src="https://unpkg.com"></script>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -107,7 +109,8 @@
   <nav class="nav-tabs">
     <button class="tab-btn active" data-tab="treeTab">Древо рода</button>
     <button class="tab-btn" data-tab="photosTab">Фото и сканы</button>
-    <button class="tab-btn" data-tab="storiesTab">Диктофон</button>
+    <button class="tab-btn" data-tab="storiesTab">Диктофон</button>    <button class="tab-btn" data-tab="schemaTab">🌳 Схема</button>
+
   </nav>
 
   <section id="treeTab">
@@ -155,7 +158,16 @@
       <button type="button" class="btn btn-primary" style="width:100%;" id="saveStoryBtn">Сохранить воспоминание</button>
     </div>
     <div id="storiesList"></div>
+  </section>  <section id="schemaTab" class="hidden">
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
+      <button class="btn btn-primary btn-sm" id="modeGraphBtn" onclick="switchSchemaMode('graph')">🕸 Интерактивный граф</button>
+      <button class="btn btn-sm" id="modeSvgBtn" onclick="switchSchemaMode('svg')">📐 Чертёж SVG (SSD / Печать)</button>
+      <button class="btn btn-sm" id="downloadSchemaBtn" onclick="downloadSchemaFile()">⬇ Скачать схему</button>
+    </div>
+    <div id="graphCanvasWrap" style="width:100%; height:62vh; background:#0d1015; border:1px solid var(--border); border-radius:14px; overflow:hidden;"></div>
+    <div id="svgSchemaWrap" class="hidden" style="width:100%; overflow-x:auto; background:#0d1015; border:1px solid var(--border); border-radius:14px; padding:16px;"></div>
   </section>
+
 </div>
 
 <div class="backdrop" id="personModal">
@@ -948,6 +960,142 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       block.classList.add("hidden");
     }
   };
+  let schemaMode = "graph";
+  let networkInstance = null;
+
+  function switchSchemaMode(mode) {
+    schemaMode = mode;
+    document.getElementById("modeGraphBtn").classList.toggle("btn-primary", mode === "graph");
+    document.getElementById("modeSvgBtn").classList.toggle("btn-primary", mode === "svg");
+    document.getElementById("graphCanvasWrap").classList.toggle("hidden", mode !== "graph");
+    document.getElementById("svgSchemaWrap").classList.toggle("hidden", mode !== "svg");
+    renderSchema();
+  }
+
+  function renderSchema() {
+    if (schemaMode === "graph") renderVisGraph();
+    else renderSvgBlueprint();
+  }
+
+  function renderVisGraph() {
+    const container = document.getElementById("graphCanvasWrap");
+    if (typeof vis === "undefined") {
+      container.innerHTML = '<div style="padding:20px; color:var(--muted);">Нет интернета для графа. Переключись на «📐 Чертёж SVG» — он работает полностью автономно!</div>';
+      return;
+    }
+    const branchColors = { direct: "#d4af37", wife: "#10b981", side: "#8b5cf6", union: "#38bdf8" };
+    const nodes = persons.map(p => ({
+      id: p.id,
+      label: p.name + "\n(" + (p.years || p.gen + "-е колено") + ")",
+      level: 10 - (p.gen || 1),
+      shape: "box",
+      margin: 10,
+      font: { color: "#f3f4f6", size: 13, face: "system-ui" },
+      color: { background: "#1b202c", border: branchColors[p.branch] || "#d4af37", highlight: { background: "#2a3244", border: "#fff" } },
+      borderWidth: 2
+    }));
+    const edges = [];
+    const seen = new Set();
+    persons.forEach(p => {
+      const links = (getMeta(p).links || []);
+      links.forEach(lk => {
+        const key = [p.id, lk.id].sort().join("_");
+        if (seen.has(key)) return;
+        seen.add(key);
+        const isSpouse = lk.role === "spouse";
+        edges.push({
+          from: lk.role === "parent" ? lk.id : p.id,
+          to: lk.role === "parent" ? p.id : lk.id,
+          dashes: isSpouse,
+          color: { color: isSpouse ? "#10b981" : "#64748b" },
+          width: isSpouse ? 2 : 1.5,
+          arrows: isSpouse ? "" : "to"
+        });
+      });
+    });
+    const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+    const options = {
+      layout: { hierarchical: { direction: "UD", sortMethod: "directed", levelSeparation: 110, nodeSpacing: 160 } },
+      physics: false,
+      interaction: { dragNodes: true, zoomView: true, dragView: true }
+    };
+    networkInstance = new vis.Network(container, data, options);
+    networkInstance.on("click", (params) => {
+      if (params.nodes.length > 0) openPersonCard(params.nodes);
+    });
+  }
+  function renderSvgBlueprint() {
+    const wrap = document.getElementById("svgSchemaWrap");
+    const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => b - a);
+    const boxW = 190, boxH = 56, gapX = 24, gapY = 85;
+    let maxCols = 1;
+    gens.forEach(g => { const c = persons.filter(p => p.gen === g).length; if (c > maxCols) maxCols = c; });
+    const width = Math.max(600, maxCols * (boxW + gapX) + 40);
+    const height = gens.length * (boxH + gapY) + 60;
+    const coords = {};
+    let svgBody = "";
+
+    gens.forEach((g, rIdx) => {
+      const rowPersons = persons.filter(p => p.gen === g);
+      const rowW = rowPersons.length * (boxW + gapX) - gapX;
+      const startX = (width - rowW) / 2;
+      const y = 30 + rIdx * (boxH + gapY);
+      svgBody += '<text x="14" y="' + (y - 8) + '" fill="#64748b" font-size="11" font-family="sans-serif">' + g + '-Е КОЛЕНО</text>';
+      rowPersons.forEach((p, cIdx) => {
+        const x = startX + cIdx * (boxW + gapX);
+        coords[p.id] = { x: x + boxW / 2, top: y, bottom: y + boxH, left: x, right: x + boxW, midY: y + boxH / 2 };
+        const stroke = p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : "#d4af37"));
+        svgBody += '<g style="cursor:pointer" onclick="openPersonCard(\'' + p.id + '\')">';
+        svgBody += '<rect x="' + x + '" y="' + y + '" width="' + boxW + '" height="' + boxH + '" rx="8" fill="#181c24" stroke="' + stroke + '" stroke-width="2"/>';
+        svgBody += '<text x="' + (x + 10) + '" y="' + (y + 23) + '" fill="#f3f4f6" font-size="12" font-weight="bold" font-family="sans-serif">' + p.name.slice(0, 24) + '</text>';
+        svgBody += '<text x="' + (x + 10) + '" y="' + (y + 42) + '" fill="#9ca3af" font-size="10" font-family="sans-serif">' + (p.years || "").slice(0, 26) + '</text>';
+        svgBody += '</g>';
+      });
+    });
+
+    let lines = "";
+    persons.forEach(p => {
+      const c1 = coords[p.id];
+      if (!c1) return;
+      (getMeta(p).links || []).forEach(lk => {
+        const c2 = coords[lk.id];
+        if (!c2) return;
+        if (lk.role === "spouse" && p.id < lk.id) {
+          lines += '<line x1="' + c1.x + '" y1="' + c1.midY + '" x2="' + c2.x + '" y2="' + c2.midY + '" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4"/>';
+        } else if (lk.role === "child") {
+          const midY = (c1.bottom + c2.top) / 2;
+          lines += '<path d="M ' + c1.x + ' ' + c1.bottom + ' L ' + c1.x + ' ' + midY + ' L ' + c2.x + ' ' + midY + ' L ' + c2.x + ' ' + c2.top + '" fill="none" stroke="#64748b" stroke-width="1.5"/>';
+        }
+      });
+    });
+
+    wrap.innerHTML = '<svg id="familySvgEl" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#0d1015;">' + lines + svgBody + '</svg>';
+  }
+
+  function downloadSchemaFile() {
+    if (schemaMode === "svg") {
+      const svgEl = document.getElementById("familySvgEl");
+      if (!svgEl) return;
+      const blob = new Blob([svgEl.outerHTML], { type: "image/svg+xml;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "drevo_roda_chertezh.svg";
+      a.click();
+    } else {
+      const canvas = document.querySelector("#graphCanvasWrap canvas");
+      if (!canvas) return toast("Переключись в чертёж SVG для скачивания");
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/png");
+      a.download = "drevo_roda_graph.png";
+      a.click();
+    }
+  }
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.tab === "schemaTab") setTimeout(renderSchema, 50);
+    });
+  });
 
   renderAll();
   initCloud();
