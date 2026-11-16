@@ -1660,6 +1660,15 @@ if(!document.getElementById('newsBtn')){
     kb.after(b);
   }, 500);
 }
+{
+  document.getElementById('nMod')?.remove();
+  document.body.insertAdjacentHTML('beforeend', `<div id="nMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:480px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:82vh;overflow-y:auto;font:14px/1.45 sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700;font-size:16px">📜 Что нового и как юзать</b><span onclick="nMod.style.display='none'" style="cursor:pointer;font-size:22px">&times;</span></div><div id="nTxt"></div></div></div>`);
+  setInterval(() => { const b=document.getElementById('newsBtn'); if(b) b.onclick=()=>nMod.style.display='flex'; }, 500);
+}
+{
+  const el = document.getElementById('nTxt');
+  if(el) el.innerHTML = `<p><b>1. 3D-карточки и живой поиск</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + золотая подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — человек загорится на схеме.</p><p><b>2. Древо от себя, «Веер» и «🎯 На схеме»</b><br>❌ Было: схема только сверху от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Расширенная анкета и кладбище</b><br>❌ Было: одно поле города.<br>✅ Стало: 3 поля географии, девичья фамилия, гражданство, контакты и GPS могилы.<br>👉 Юзать: открой карточку → «✏️ Анкета».</p><p><b>4. «🧬 Кто кому», «⏳ Лента» и права</b><br>✅ Стало: калькулятор родства, хронология по годам и защита от случайного удаления.</p>`;
+}
 
 
 </script>
