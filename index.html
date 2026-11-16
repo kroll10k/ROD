@@ -1466,6 +1466,10 @@ if(!document.getElementById('newsBtn')){
   b.onclick = () => alert('📜 ЧТО НОВОГО В ЛЕТОПИСИ:\n\n✨ 3D-карточки и живой поиск с золотой подсветкой на схеме.\n🌳 Древо корнями снизу вверх + режим «Веер» + выбор «Точки отсчёта» (можно строить схему от себя или любого родственника).\n🔗 Удобная привязка родных в обе стороны через кнопку «Семья» + фотогалерея.');
   box.prepend(b);
 }
+document.body.insertAdjacentHTML('beforeend',`<div id="nMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:460px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:80vh;overflow-y:auto;font:14px/1.45 sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700;font-size:16px">📜 Что нового и как юзать</b><span onclick="nMod.style.display='none'" style="cursor:pointer;font-size:20px">&times;</span></div><div id="nList"></div></div></div>`);
+nList.innerHTML = `<p><b>1. 3D-карточки и поиск</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — нужный человек загорится золотым на схеме.</p><p><b>2. Древо от себя и «Веер»</b><br>❌ Было: схема только сверху от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Связи и фото</b><br>❌ Было: сухие записи.<br>✅ Стало: галерея и двойная привязка.<br>👉 Юзать: открой карточку и жми «🔗 Семья».</p>`;
+const nb = document.getElementById('newsBtn');
+if(nb) nb.onclick = () => nMod.style.display = 'flex';
 
 </script>
 </body>
