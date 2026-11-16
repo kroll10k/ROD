@@ -1525,6 +1525,18 @@ document.addEventListener('click', e => {
     b2.style.borderColor = '#d4af37'; b2.style.color = '#ffd700';
   }, 400);
 }
+setInterval(() => {
+  const inp = [...document.querySelectorAll('input')].find(i => !i.dataset.geo3 && /город|деревн/i.test(i.previousElementSibling?.textContent || i.placeholder));
+  if(!inp) return;
+  inp.dataset.geo3 = '1'; inp.style.display = 'none';
+  if(inp.previousElementSibling) inp.previousElementSibling.textContent = 'ГЕОГРАФИЯ (РОЖДЕНИЕ / ЖИЗНЬ / СТРАНА)';
+  const p = inp.value.split('|').map(s => s.replace(/^.*?:\s*/,'').trim());
+  const box = document.createElement('div');
+  box.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px';
+  box.innerHTML = ['👶 Родился','🏠 Жил','🌍 Страна'].map((ph,idx)=>`<input placeholder="${ph}" value="${p[idx]||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4af37;background:inherit;color:inherit;font-size:13px">`).join('');
+  inp.after(box);
+  box.oninput = () => { const v=[...box.querySelectorAll('input')].map(x=>x.value.trim()); inp.value=`Род.: ${v} | Жив.: ${v[1]} | Страна: ${v[2]}`; inp.dispatchEvent(new Event('input',{bubbles:true})); };
+}, 400);
 
 
 
