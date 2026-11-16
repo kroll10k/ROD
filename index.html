@@ -981,6 +981,10 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       document.getElementById("lkTarget").value = "";
       filterLinkCandidates();
       openModal("linkModal");
+             openModal("linkModal");
+    document.getElementById("linkModal").style.zIndex = "9999";
+    setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
+ 
       setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
     };
 
