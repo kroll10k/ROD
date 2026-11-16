@@ -357,11 +357,15 @@
     </div>
   </div>
 </div>
-      <div class="backdrop" id="linkModal">
-  <div class="modal">
-    <div class="modal-head"><h3>Привязать родственника</h3><button class="close-btn" onclick="closeModal('linkModal')">&times;</button></div>
+  <div class="backdrop" id="linkModal" style="z-index: 99999;">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-head">
+      <h3>🔗 Привязать родственника</h3>
+      <button type="button" class="close-btn" onclick="document.getElementById('linkModal').style.display='none'; document.getElementById('linkModal').classList.remove('open');">&times;</button>
+    </div>
     <form id="linkForm">
-      <div class="field"><label class="label">Кем приходится?</label>
+      <div class="field">
+        <label class="label">Кем приходится?</label>
         <select id="lkRole">
           <option value="spouse">💍 Супруг(а)</option>
           <option value="parent">⬆️ Отец / Мать</option>
@@ -369,19 +373,16 @@
           <option value="sibling">↔️ Брат / Сестра</option>
         </select>
       </div>
-           <div class="field">
-        <label class="label">Поиск человека (ФИО, фамилия, год или колено)</label>
-        <div class="rel-search-box">
-          <input type="text" id="lkSearchInput" placeholder="Начни вводить: Баранов, Митрахович, 1826..." oninput="filterLinkCandidates()" autocomplete="off">
-          <input type="hidden" id="lkTarget" required>
-          <div class="rel-results" id="lkResultsList"></div>
-        </div>
+      <div class="field">
+        <label class="label">Найти человека (введи фамилию или имя)</label>
+        <input type="text" id="lkSearchInput" placeholder="Например: Баранов, Митрахович..." autocomplete="off">
+        <select id="lkTarget" size="6" style="margin-top:8px; height:auto; padding:6px;" required></select>
       </div>
-
       <button type="submit" class="btn btn-primary" style="width:100%;">Привязать в обе стороны</button>
     </form>
   </div>
 </div>
+  
 
 <div class="toast" id="toast">Готово</div>
 <script>
@@ -942,60 +943,39 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     openPersonCard(p.id);
     toast("Связь удалена");
   }
+  function filterLinkCandidates() {
+    const inp = document.getElementById("lkSearchInput");
+    const sel = document.getElementById("lkTarget");
+    if (!sel) return;
+    const q = inp ? inp.value.trim().toLowerCase() : "";
+    const list = persons.filter(x => x.id !== activePersonId && (!q || x.name.toLowerCase().includes(q) || (x.years || "").toLowerCase().includes(q)));
+    sel.innerHTML = list.map(x => '<option value="' + x.id + '" style="padding:6px 8px; border-bottom:1px solid var(--border);">' + x.name + (x.years ? ' (' + x.years + ')' : '') + '</option>').join("");
+    if (sel.options.length > 0) sel.selectedIndex = 0;
+  }
 
-    function filterLinkCandidates() {
-      const q = (document.getElementById("lkSearchInput").value || "").toLowerCase().trim();
-      const selId = document.getElementById("lkTarget").value;
-      const list = document.getElementById("lkResultsList");
-      const matches = persons
-        .filter(x => x.id !== activePersonId)
-        .filter(x => {
-          if (!q) return true;
-          const hay = ((x.name || "") + " " + (x.maiden || "") + " " + (x.years || "") + " " + (x.location || "") + " " + (x.gen || "")).toLowerCase();
-          return hay.includes(q);
-        })
-        .sort((a, b) => (a.gen || 0) - (b.gen || 0) || (a.name || "").localeCompare(b.name || ""));
-
-      if (!matches.length) {
-        list.innerHTML = '<div style="padding:10px;text-align:center;color:var(--muted);font-size:0.84rem;">Никого не найдено</div>';
-        return;
-      }
-      list.innerHTML = matches.map(x => {
-        const activeCls = x.id === selId ? " selected" : "";
-        const sub = [x.maiden ? "урожд. " + x.maiden : "", x.years, x.gen ? x.gen + " кол." : ""].filter(Boolean).join(" • ");
-        return '<div class="rel-option' + activeCls + '" onclick="pickLinkCandidate(\'' + x.id + '\', this)">' +
-          '<div><div>' + x.name + '</div>' + (sub ? '<div style="font-size:0.75rem;color:var(--muted);">' + sub + '</div>' : '') + '</div>' +
-          '</div>';
-      }).join("");
-    }
-
-    function pickLinkCandidate(id, el) {
-      document.getElementById("lkTarget").value = id;
-      const person = persons.find(x => x.id === id);
-      if (person) document.getElementById("lkSearchInput").value = person.name;
-      document.querySelectorAll("#lkResultsList .rel-option").forEach(n => n.classList.remove("selected"));
-      if (el) el.classList.add("selected");
-    }
-
-    document.getElementById("openAddLinkBtn").onclick = () => {
-      document.getElementById("lkSearchInput").value = "";
-      document.getElementById("lkTarget").value = "";
+  const addLinkBtn = document.getElementById("openAddLinkBtn");
+  if (addLinkBtn) {
+    addLinkBtn.onclick = function(e) {
+      if (e) e.preventDefault();
+      const modal = document.getElementById("linkModal");
+      const inp = document.getElementById("lkSearchInput");
+      if (!modal) return;
+      if (inp) { inp.value = ""; inp.oninput = filterLinkCandidates; }
       filterLinkCandidates();
-      openModal("linkModal");
-             openModal("linkModal");
-    document.getElementById("linkModal").style.zIndex = "9999";
-    setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
- 
-      setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
+      modal.classList.add("open");
+      modal.style.display = "flex";
+      modal.style.zIndex = "99999";
+      if (inp) setTimeout(() => inp.focus(), 50);
     };
+  }
 
-  document.getElementById("linkForm").onsubmit = async (e) => {
+  document.getElementById("linkForm").onsubmit = async function(e) {
     e.preventDefault();
     const p1 = persons.find(x => x.id === activePersonId);
     const role = document.getElementById("lkRole").value;
     const tid = document.getElementById("lkTarget").value;
     const p2 = persons.find(x => x.id === tid);
-    if (!p1 || !p2) return;
+    if (!p1 || !p2) return toast("Выбери человека из списка!");
     pushLink(p1, role, p2.id);
     pushLink(p2, backRole[role], p1.id);
     localStorage.setItem("chronicle_persons", JSON.stringify(persons));
@@ -1003,10 +983,14 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       await sbFetch("persons", "PATCH", { stories: p1.stories }, "?id=eq." + p1.id);
       await sbFetch("persons", "PATCH", { stories: p2.stories }, "?id=eq." + p2.id);
     } catch (err) {}
-    closeModal("linkModal");
+    const modal = document.getElementById("linkModal");
+    modal.style.display = "none";
+    modal.classList.remove("open");
     openPersonCard(p1.id);
     toast("Связано в обе стороны!");
   };
+
+  
 
   const baseOpenCard = openPersonCard;
   openPersonCard = function(id) {
