@@ -1502,6 +1502,17 @@ if(!isAdmin){
     });
   }, 500);
 }
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if(!btn || !/сохранить/i.test(btn.textContent)) return;
+  const modal = btn.closest('div[style*="fixed"], .modal, [role="dialog"]') || document;
+  const ta = modal.querySelector('textarea');
+  if(!ta) return;
+  const d = new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+  const mark = `\n✍️ Правка: ${curUser} (${d})`;
+  ta.value = ta.value.replace(/\n✍️ Правка:.*$/m, '') + mark;
+  ta.dispatchEvent(new Event('input', {bubbles:true}));
+}, true);
 
 </script>
 </body>
