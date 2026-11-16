@@ -1626,6 +1626,19 @@ if(!document.getElementById('newsBtn')){
     add('kinBtn', '🧬 Кто кому', false, () => { const l=window.persons||window.allPersons||[]; const o=l.map((p,i)=>`<option value="${p.id??i}">${p.name||p.fio}</option>`).join(''); if(window.kSel1){kSel1.innerHTML=kSel2.innerHTML=o;kinMod.style.display='flex';} });
   }, 500);
 }
+{
+  setTimeout(() => {
+    const kb = document.getElementById('kinBtn');
+    if(!kb) return;
+    kb.onclick = () => {
+      const ref = [...document.querySelectorAll('select')].find(s => s.id!=='kSel1' && s.id!=='kSel2' && s.options.length > 1);
+      const opts = ref ? [...ref.options].filter(o=>o.value).map(o=>`<option value="${o.value}">${o.text}</option>`).join('') : [...document.querySelectorAll('.card,[class*="card"]')].map((c,i)=>`<option value="${i}">${c.innerText.split('\n').find(s=>s.trim().length>4)}</option>`).join('');
+      kSel1.innerHTML = kSel2.innerHTML = opts;
+      kinMod.style.display = 'flex';
+      if(window.calcKin) window.calcKin();
+    };
+  }, 600);
+}
 
 
 </script>
