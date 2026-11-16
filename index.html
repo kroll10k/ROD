@@ -978,64 +978,28 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     if (schemaMode === "graph") renderVisGraph();
     else renderSvgBlueprint();
   }
-
-    function renderVisGraph() {
-    const container = document.getElementById("graphCanvasWrap");
-    container.innerHTML = "";
-    container.style.position = "relative";
-    container.style.touchAction = "none";
-    renderSvgBlueprint();
-    const svgOrig = document.getElementById("familySvgEl");
-    if (!svgOrig) return;
-    const clone = svgOrig.cloneNode(true);
-    clone.id = "interactiveSvgEl";
-    clone.style.transformOrigin = "0 0";
-    container.appendChild(clone);
-
-    let scale = 0.55, panX = 10, panY = 20, dragging = false, startX = 0, startY = 0, lastDist = 0;
-    const updateTransform = () => { clone.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; };
-    updateTransform();
-
-    container.onpointerdown = (e) => { dragging = true; startX = e.clientX - panX; startY = e.clientY - panY; };
-    container.onpointermove = (e) => { if (!dragging) return; panX = e.clientX - startX; panY = e.clientY - startY; updateTransform(); };
-    container.onpointerup = () => { dragging = false; };
-    container.ontouchmove = (e) => {
-      if (e.touches.length === 2) {
-        dragging = false;
-        const dx = e.touches.clientX - e.touches.clientX;
-        const dy = e.touches.clientY - e.touches.clientY;
-        const dist = Math.hypot(dx, dy);
-        if (lastDist) scale = Math.min(2.5, Math.max(0.25, scale * (dist / lastDist)));
-        lastDist = dist;
-        updateTransform();
-      }
-    };
-    container.ontouchend = () => { lastDist = 0; };
-  }
-
-    function renderSvgBlueprint() {
-    const wrap = document.getElementById("svgSchemaWrap");
+  function buildTreeSvg(svgId) {
     const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => b - a);
-    const boxW = 250, boxH = 58, gapX = 24, gapY = 85;
+    const boxW = 240, boxH = 58, gapX = 28, gapY = 95;
     let maxCols = 1;
     gens.forEach(g => { const c = persons.filter(p => p.gen === g).length; if (c > maxCols) maxCols = c; });
-    const width = Math.max(650, maxCols * (boxW + gapX) + 60);
-    const height = gens.length * (boxH + gapY) + 60;
+    const width = Math.max(680, maxCols * (boxW + gapX) + 80);
+    const height = gens.length * (boxH + gapY) + 70;
     const coords = {};
     let svgBody = "";
 
     gens.forEach((g, rIdx) => {
       const rowPersons = persons.filter(p => p.gen === g);
       const rowW = rowPersons.length * (boxW + gapX) - gapX;
-      const startX = Math.max(24, (width - rowW) / 2);
-      const y = 34 + rIdx * (boxH + gapY);
-      svgBody += '<text x="24" y="' + (y - 10) + '" fill="#9ca3af" font-size="11" font-weight="bold" font-family="sans-serif">' + g + '-Е КОЛЕНО</text>';
+      const startX = Math.max(30, (width - rowW) / 2);
+      const y = 38 + rIdx * (boxH + gapY);
+      svgBody += '<text x="24" y="' + (y - 12) + '" fill="#9ca3af" font-size="11" font-weight="bold" font-family="sans-serif">' + g + '-Е КОЛЕНО</text>';
       rowPersons.forEach((p, cIdx) => {
         const x = startX + cIdx * (boxW + gapX);
         coords[p.id] = { x: x + boxW / 2, top: y, bottom: y + boxH, left: x, right: x + boxW, midY: y + boxH / 2 };
         const stroke = p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : "#d4af37"));
         svgBody += '<g style="cursor:pointer" onclick="openPersonCard(\'' + p.id + '\')">';
-        svgBody += '<rect x="' + x + '" y="' + y + '" width="' + boxW + '" height="' + boxH + '" rx="8" fill="#181c24" stroke="' + stroke + '" stroke-width="2"/>';
+        svgBody += '<rect x="' + x + '" y="' + y + '" width="' + boxW + '" height="' + boxH + '" rx="9" fill="#181c24" stroke="' + stroke + '" stroke-width="2"/>';
         svgBody += '<text x="' + (x + 12) + '" y="' + (y + 24) + '" fill="#f3f4f6" font-size="11.5" font-weight="bold" font-family="sans-serif">' + p.name + '</text>';
         svgBody += '<text x="' + (x + 12) + '" y="' + (y + 44) + '" fill="#9ca3af" font-size="10" font-family="sans-serif">' + (p.years || "") + '</text>';
         svgBody += '</g>';
@@ -1043,20 +1007,87 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     });
 
     let lines = "";
+    const drawnPairs = new Set();
     persons.forEach(p => {
       const c1 = coords[p.id];
       if (!c1) return;
       (getMeta(p).links || []).forEach(lk => {
         const c2 = coords[lk.id];
         if (!c2) return;
-        if (lk.role === "spouse" && p.id < lk.id) {
-          lines += '<line x1="' + c1.x + '" y1="' + c1.midY + '" x2="' + c2.x + '" y2="' + c2.midY + '" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4"/>';
-        } else if (lk.role === "child") {
-          const midY = (c1.bottom + c2.top) / 2;
-          lines += '<path d="M ' + c1.x + ' ' + c1.bottom + ' L ' + c1.x + ' ' + midY + ' L ' + c2.x + ' ' + midY + ' L ' + c2.x + ' ' + c2.top + '" fill="none" stroke="#64748b" stroke-width="1.5"/>';
+        const pairKey = [p.id, lk.id].sort().join("__");
+        if (lk.role === "spouse") {
+          if (drawnPairs.has(pairKey)) return;
+          drawnPairs.add(pairKey);
+          lines += '<line x1="' + c1.x + '" y1="' + c1.midY + '" x2="' + c2.x + '" y2="' + c2.midY + '" stroke="#10b981" stroke-width="2.5" stroke-dasharray="5,4"/>';
+        } else if (lk.role === "child" || lk.role === "parent") {
+          if (drawnPairs.has(pairKey)) return;
+          drawnPairs.add(pairKey);
+          const topC = lk.role === "child" ? c1 : c2;
+          const botC = lk.role === "child" ? c2 : c1;
+          const midY = (topC.bottom + botC.top) / 2;
+          lines += '<path d="M ' + topC.x + ' ' + topC.bottom + ' L ' + topC.x + ' ' + midY + ' L ' + botC.x + ' ' + midY + ' L ' + botC.x + ' ' + (botC.top - 5) + '" fill="none" stroke="#d4af37" stroke-width="1.8" stroke-opacity="0.75"/>';
+          lines += '<polygon points="' + botC.x + ',' + botC.top + ' ' + (botC.x - 5) + ',' + (botC.top - 8) + ' ' + (botC.x + 5) + ',' + (botC.top - 8) + '" fill="#d4af37"/>';
         }
       });
     });
+
+    return '<svg id="' + svgId + '" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#0d1015; display:block;">' + lines + svgBody + '</svg>';
+  }
+
+  function renderSvgBlueprint() {
+    document.getElementById("svgSchemaWrap").innerHTML = buildTreeSvg("familySvgEl");
+  }
+
+  function renderVisGraph() {
+    const container = document.getElementById("graphCanvasWrap");
+    container.style.position = "relative";
+    container.style.touchAction = "none";
+    container.innerHTML = buildTreeSvg("interactiveSvgEl") +
+      '<div style="position:absolute; right:12px; bottom:12px; display:flex; gap:6px; z-index:10;">' +
+      '<button type="button" class="btn btn-sm" id="zOutBtn" style="font-size:1.1rem; padding:6px 12px;">－</button>' +
+      '<button type="button" class="btn btn-sm" id="zResetBtn" style="padding:6px 10px;">100%</button>' +
+      '<button type="button" class="btn btn-sm" id="zInBtn" style="font-size:1.1rem; padding:6px 12px;">＋</button>' +
+      '</div>';
+
+    const svgEl = document.getElementById("interactiveSvgEl");
+    svgEl.style.transformOrigin = "0 0";
+    let scale = 0.55, panX = 10, panY = 10, dragging = false, startX = 0, startY = 0, startDist = 0, startScale = 0.55;
+    const apply = () => { svgEl.style.transform = "translate(" + panX + "px, " + panY + "px) scale(" + scale + ")"; };
+    apply();
+
+    document.getElementById("zInBtn").onclick = () => { scale = Math.min(2.5, scale + 0.15); apply(); };
+    document.getElementById("zOutBtn").onclick = () => { scale = Math.max(0.25, scale - 0.15); apply(); };
+    document.getElementById("zResetBtn").onclick = () => { scale = 0.85; panX = 10; panY = 10; apply(); };
+
+    container.onwheel = (e) => { e.preventDefault(); scale = Math.min(2.5, Math.max(0.25, scale + (e.deltaY < 0 ? 0.1 : -0.1))); apply(); };
+
+    container.ontouchstart = (e) => {
+      if (e.touches.length === 1) {
+        dragging = true;
+        startX = e.touches[0].clientX - panX;
+        startY = e.touches[0].clientY - panY;
+      } else if (e.touches.length === 2) {
+        dragging = false;
+        startDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        startScale = scale;
+      }
+    };
+    container.ontouchmove = (e) => {
+      e.preventDefault();
+      if (e.touches.length === 1 && dragging) {
+        panX = e.touches[0].clientX - startX;
+        panY = e.touches[0].clientY - startY;
+        apply();
+      } else if (e.touches.length === 2 && startDist > 0) {
+        const curDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        scale = Math.min(2.5, Math.max(0.25, startScale * (curDist / startDist)));
+        apply();
+      }
+    };
+    container.ontouchend = () => { dragging = false; startDist = 0; };
+  }
+
+    
 
     wrap.innerHTML = '<svg id="familySvgEl" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#0d1015;">' + lines + svgBody + '</svg>';
   }
