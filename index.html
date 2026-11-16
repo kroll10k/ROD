@@ -1,4 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+      
 
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Семейная летопись • Архив рода</title>
+  <style>
+    :root {
+      --bg: #0d0e11; --bg-elevated: #15171c; --card: #1a1d23;
+      --border: #2a2f3a; --border-light: #3b4252; --text: #f2f0ea;
+      --muted: #969ca8; --gold: #d8a85c; --gold-dim: rgba(216, 168, 92, 0.14);
+      --blue: #4f8ef7; --purple: #9b6ef3; --teal: #2dd4bf; --green: #2eb885; --red: #ef4444;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 16px 14px 90px; }
+    .container { max-width: 1140px; margin: 0 auto; }
+    header { background: linear-gradient(145deg, var(--bg-elevated), #111317); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+    .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 600; margin-bottom: 4px; }
+    h1 { font-family: Georgia, serif; font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.1; color: #fff; }
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,0.05); color: var(--muted); margin-top: 6px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+    .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: var(--bg-elevated); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; }
+    .tab-btn { background: transparent; border: none; color: var(--muted); padding: 11px 8px; border-radius: 10px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .tab-btn.active { background: var(--gold); color: #111; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; border-radius: 10px; font-size: 0.86rem; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, var(--gold), #c28e3e); color: #111; border: none; font-weight: 600; }
+    .btn-danger { background: rgba(239, 68, 68, 0.14); border-color: var(--red); color: #fca5a5; }
+    .btn-sm { padding: 6px 10px; font-size: 0.78rem; }
+    input[type="text"], textarea, select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 11px 13px; border-radius: 10px; font-size: 0.95rem; font-family: inherit; outline: none; }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+    .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; }
+    .pill { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 99px; font-size: 0.83rem; white-space: nowrap; cursor: pointer; }
+    .pill.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); font-weight: 600; }
+    .gen-title { font-family: Georgia, serif; font-size: 1.4rem; color: var(--gold); margin: 22px 0 12px; display: flex; align-items: center; gap: 10px; }
+    .gen-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; position: relative; overflow: hidden; }
+    .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--blue); }
+    .card.side::before { background: var(--purple); }
+    .card.wife::before { background: var(--teal); }
+    .card.union::before { background: var(--gold); }
+    .card-top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .avatar-mini { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1px solid var(--gold); flex-shrink: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-weight: 700; color: var(--gold); }
+    .card-name { font-family: Georgia, serif; font-size: 1.22rem; font-weight: 700; color: #fff; line-height: 1.2; }
+    .card-maiden { font-size: 0.8rem; color: var(--muted); }
+    .card-years { color: var(--gold); font-size: 0.82rem; margin-top: 2px; }
+    .card-bio { color: var(--muted); font-size: 0.88rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-meta { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; }
+    .timeline { position: relative; padding-left: 18px; border-left: 2px solid var(--border-light); margin: 10px 0; }
+    .tl-item { position: relative; margin-bottom: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 11px 13px; }
+    .tl-item::before { content: ""; position: absolute; left: -25px; top: 15px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); border: 2px solid var(--bg-elevated); }
+    .tl-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 0.8rem; }
+    .tl-year { color: var(--gold); font-weight: 700; }
+    .tl-cat { background: var(--gold-dim); color: var(--gold); padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; }
+    .tl-text { font-size: 0.9rem; color: var(--text); white-space: pre-line; }
+    .source-card { background: rgba(46,184,133,0.08); border: 1px solid rgba(46,184,133,0.3); border-radius: 11px; padding: 11px 13px; margin-bottom: 8px; font-size: 0.86rem; }
+    .source-ref { color: #6ee7b7; font-weight: 600; margin-bottom: 3px; }
+    .mini-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .mini-gallery img { width: 100%; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+    .upload-box { display: block; background: var(--bg-elevated); border: 2px dashed var(--border-light); border-radius: 16px; padding: 22px 16px; text-align: center; margin-bottom: 16px; cursor: pointer; }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+    .photo-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; position: relative; }
+    .photo-card img { width: 100%; height: 210px; object-fit: cover; display: block; }
+    .doc-badge { position: absolute; top: 8px; right: 8px; background: rgba(13,14,17,0.85); border: 1px solid var(--green); color: #6ee7b7; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+    .photo-card-body { padding: 12px; }
+    .photo-tags-count { font-size: 0.78rem; color: var(--gold); margin-top: 4px; }
+    .tagger-wrap { position: relative; display: inline-block; width: 100%; background: #000; border-radius: 10px; overflow: hidden; }
+    .tagger-wrap img { width: 100%; display: block; }
+    .face-pin { position: absolute; transform: translate(-50%, -50%); background: rgba(13, 14, 17, 0.9); border: 2px solid var(--gold); color: #fff; padding: 4px 9px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+    .rec-panel { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .story-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+    .story-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gold); margin-bottom: 6px; }
+    audio { width: 100%; height: 36px; margin-top: 8px; }
+    .backdrop { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 100; align-items: center; justify-content: center; padding: 12px; }
+    .backdrop.open { display: flex; }
+    .modal { background: var(--bg-elevated); border: 1px solid var(--border-light); border-radius: 18px; max-width: 640px; width: 100%; padding: 22px; max-height: 92vh; overflow-y: auto; }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .close-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
+    .field { margin-bottom: 12px; }
+    .label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gold); color: #111; font-weight: 600; padding: 10px 20px; border-radius: 99px; z-index: 300; transition: 0.25s; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .hidden { display: none !important; }
+            .rel-search-box { position: relative; margin-top: 6px; }
+    .rel-results {
+      max-height: 210px; overflow-y: auto; margin-top: 6px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg); display: flex; flex-direction: column;
+    }
+    .rel-option {
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; gap: 8px; font-size: 0.88rem;
+    }
+    .rel-option:last-child { border-bottom: none; }
+    .rel-option:hover, .rel-option.selected { background: var(--gold-dim); }
+    .rel-option.selected { border-left: 4px solid var(--gold); font-weight: 600; }
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <div class="eyebrow">НИАБ Ф.333 Оп.9 • Козловка — Светлогорск</div>
+      <h1>Летопись рода</h1>
+      <div class="status-badge">
+        <span class="status-dot" id="cloudDot"></span>
+        <span id="cloudStatusText">Локальный режим (телефон)</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="openAddPerson()">＋ Предок</button>
+      <button class="btn" id="shareLinkBtn">🔗 Родне</button>
+      <button class="btn" onclick="openModal('cloudModal')">⚙ Облако</button>
+    </div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-tab="treeTab">Древо рода</button>
+    <button class="tab-btn" data-tab="photosTab">Фото и сканы</button>
+    <button class="tab-btn" data-tab="storiesTab">Диктофон</button>    <button class="tab-btn" data-tab="schemaTab">🌳 Схема</button>
+
+  </nav>
+
+  <section id="treeTab">
+    <div style="margin-bottom: 12px;"><input type="text" id="searchInput" placeholder="Поиск по имени, фамилии, учёбе, работе, фонду НИАБ..."></div>
+    <div class="filter-row">
+      <button class="pill active" data-filter="all">Весь род</button>
+      <button class="pill" data-filter="direct">Линия Николая</button>
+      <button class="pill" data-filter="wife">Линия Елены</button>
+      <button class="pill" data-filter="side">Боковые ветви</button>
+      <button class="pill" data-filter="archive">НИАБ и поиск</button>
+    </div>
+    <div id="treeContainer"></div>
+  </section>
+
+  <section id="photosTab" class="hidden">
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <select id="uploadTypeSelect" style="max-width:240px;">
+        <option value="photo">📸 Загрузить как Фото</option>
+        <option value="doc">📄 Загрузить как Архивный скан</option>
+      </select>
+    </div>
+    <label class="upload-box" for="photoFileInput">
+      <div style="font-size: 2rem; margin-bottom: 6px;">📂</div>
+      <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Выбрать файлы пачкой с телефона</div>
+      <div style="font-size: 0.84rem; color: var(--muted);">Фотографии альбомов или сканы ревизий НИАБ. Сжимаются автоматически.</div>
+      <input type="file" id="photoFileInput" accept="image/*" multiple class="hidden">
+    </label>
+    <div id="uploadProgress" style="text-align:center; color:var(--gold); margin-bottom:14px; font-size:0.9rem;" class="hidden"></div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </section>
+
+  <section id="storiesTab" class="hidden">
+    <div class="rec-panel">
+      <div style="font-weight: 600; margin-bottom: 10px; color: var(--gold);">Записать воспоминание со слов родных</div>
+      <div class="field"><label class="label">О ком или от кого запись?</label><select id="storyPersonSelect"></select></div>
+      <div class="field"><label class="label">Текст байки (можно надиктовать голосом)</label><textarea id="storyTextInput" rows="3" placeholder="Нажми «Голос в текст» или впиши вручную..."></textarea></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+        <button type="button" class="btn btn-sm" id="speechToTextBtn">🗣 Голос в текст</button>
+        <button type="button" class="btn btn-sm" id="recordAudioBtn">🔴 Записать звук</button>
+      </div>
+      <div id="audioPreviewWrap" class="hidden" style="margin-bottom:12px;">
+        <div style="font-size:0.8rem; color:var(--green);">Аудиозапись готова:</div>
+        <audio id="audioPreview" controls></audio>
+      </div>
+      <button type="button" class="btn btn-primary" style="width:100%;" id="saveStoryBtn">Сохранить воспоминание</button>
+    </div>
+    <div id="storiesList"></div>
+  </section>  <section id="schemaTab" class="hidden">
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
+      <button class="btn btn-primary btn-sm" id="modeGraphBtn" onclick="switchSchemaMode('graph')">🕸 Интерактивный граф</button>
+      <button class="btn btn-sm" id="modeSvgBtn" onclick="switchSchemaMode('svg')">📐 Чертёж SVG (SSD / Печать)</button>
+      <button class="btn btn-sm" id="downloadSchemaBtn" onclick="downloadSchemaFile()">⬇ Скачать схему</button>
+    </div>
+    <div id="graphCanvasWrap" style="width:100%; height:62vh; background:#0d1015; border:1px solid var(--border); border-radius:14px; overflow:hidden;"></div>
+    <div id="svgSchemaWrap" class="hidden" style="width:100%; overflow-x:auto; background:#0d1015; border:1px solid var(--border); border-radius:14px; padding:16px;"></div>
+  </section>
+
+</div>
+
+<div class="backdrop" id="personModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div style="display:flex; gap:14px; align-items:center;">
+        <img id="mAvatar" src="" class="avatar-mini hidden" style="width:64px; height:64px;">
+        <div>
+          <h2 id="mName" style="font-family:Georgia,serif; font-size:1.65rem; line-height:1.15;"></h2>
+          <div id="mMaiden" style="color:var(--muted); font-size:0.84rem;"></div>
+          <div id="mYears" style="color:var(--gold); font-size:0.9rem; margin-top:2px;"></div>
+        </div>
+      </div>
+      <button class="close-btn" onclick="closeModal('personModal')">&times;</button>
+    </div>
+          
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn btn-sm" id="editPersonBtn">✏️ Анкета</button>
+      <button class="btn btn-primary btn-sm" id="openAddEventBtn">＋ Веха жизни</button>
+            <button class="btn btn-sm" id="openAddSourceBtn">📜 Источник НИАБ</button>
+      <button class="btn btn-sm" id="openAddLinkBtn" onclick="openFamilyLinkModal()">🔗 Семья</button>
+
+
+    </div>
+    <div id="mQuoteBlock" class="hidden" style="font-family:Georgia,serif; font-style:italic; color:var(--gold); background:var(--gold-dim); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:0.95rem;"></div>
+    <div id="mLinksBlock" class="hidden" style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:14px;">
+      <div class="label" style="margin-bottom:8px;">Семья и родственные связи</div>
+      <div id="mLinksList" style="display:flex; flex-direction:column; gap:6px; font-size:0.9rem;"></div>
+    </div>
+
+
+    <div class="field"><div class="label">О человеке</div><div id="mBio" style="font-size:0.95rem; white-space:pre-line;"></div></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+      <div><div class="label">География</div><div id="mLoc" style="color:var(--muted); font-size:0.88rem;"></div></div>
+      <div id="mBurialBlock" class="hidden"><div class="label">Память / Захоронение</div><div id="mBurial" style="color:var(--muted); font-size:0.88rem;"></div></div>
+    </div>
+    <div class="field"><div class="label">Жизненный путь (учёба, работа, события)</div><div id="mTimeline" class="timeline"></div></div>
+    <div class="field">
+      <div class="label">Архивные источники, ревизии и документы</div>
+      <div id="mSourcesList"></div>
+      <div id="mArchiveLegacy" class="source-card hidden"><div class="source-ref">Архивная заметка</div><div id="mArchive"></div></div>
+    </div>
+    <div class="field" id="mPhotosBlock" class="hidden"><div class="label">Фотографии и сканы с привязкой</div><div id="mPhotos" class="mini-gallery"></div></div>
+    <div class="field" id="mStoriesBlock"><div class="label">Записанные голосом воспоминания</div><div id="mStories"></div></div>
+  </div>
+</div>
+
+<div class="backdrop" id="eventModal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="eventModalTitle">Новая веха в жизни</h3><button class="close-btn" onclick="closeModal('eventModal')">&times;</button></div>
+    <form id="eventForm">
+      <input type="hidden" id="evIdx">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field"><label class="label">Год / Период *</label><input type="text" id="evYear" required placeholder="2012 – 2017"></div>
+        <div class="field">
+          <label class="label">Категория</label>
+          <select id="evCat">
+            <option value="🎓 Учёба">🎓 Учёба</option><option value="💼 Работа и дело">💼 Работа и дело</option>
+            <option value="🏠 Переезд / Дом">🏠 Переезд / Дом</option><option value="💍 Семья">💍 Семья</option>
+            <option value="🎖 Подвиг / Награда">🎖 Подвиг / Награда</option><option value="✨ Важная веха">✨ Важная веха</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label class="label">Описание *</label><textarea id="evText" rows="3" required placeholder="Где училась, специальность, кем работала, важные события..."></textarea></div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-danger btn-sm hidden" id="deleteEventBtn">🗑 Удалить</button>
+        <button type="submit" class="btn btn-primary" style="flex:1;">Сохранить веху</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="backdrop" id="sourceModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Прикрепить архивный источник</h3><button class="close-btn" onclick="closeModal('sourceModal')">&times;</button></div>
+    <form id="sourceForm">
+      <div class="field"><label class="label">Шифр архива / Источник *</label><input type="text" id="srcRef" required placeholder="НИАБ Ф.333 Оп.9 Д.123 Л.45 (Ревизия 1858 г.)"></div>
+      <div class="field"><label class="label">Выписка / Расшифровка факта *</label><textarea id="srcText" rows="3" required placeholder="Что именно написано в документе про двор, возраст, состав семьи..."></textarea></div>
+      <div class="field"><label class="label">Привязать скан из галереи (если загружен)</label><select id="srcScanSelect"><option value="">— Без скана —</option></select></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Прикрепить к предку</button>
+    </form>
+  </div>
+</div>
 
 <div class="backdrop" id="photoModal">
   <div class="modal">
