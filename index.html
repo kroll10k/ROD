@@ -995,16 +995,7 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
    setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
  }
 
-      document.getElementById("lkSearchInput").value = "";
-      document.getElementById("lkTarget").value = "";
-      filterLinkCandidates();
-      const lm = document.getElementById("linkModal");
-      lm.classList.remove("hidden");
-      lm.classList.add("open");
-      lm.style.display = "flex";
-      lm.style.zIndex = "99999";
-      setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
-    };
+
 
 
   document.getElementById("linkForm").onsubmit = async (e) => {
