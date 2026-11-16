@@ -960,6 +960,8 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       const modal = document.getElementById("linkModal");
       const inp = document.getElementById("lkSearchInput");
       if (!modal) return;
+             document.body.appendChild(modal);
+   
       if (inp) { inp.value = ""; inp.oninput = filterLinkCandidates; }
       filterLinkCandidates();
       modal.classList.add("open");
