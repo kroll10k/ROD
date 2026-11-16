@@ -1513,17 +1513,17 @@ document.addEventListener('click', e => {
   ta.value = ta.value.replace(/\n✍️ Правка:.*$/m, '') + mark;
   ta.dispatchEvent(new Event('input', {bubbles:true}));
 }, true);
-const row = [...document.querySelectorAll('button')].find(b=>/Предок/i.test(b.textContent))?.parentElement;
-const nb = document.getElementById('newsBtn');
-const wb = document.getElementById('whoBtn');
-if(row && nb && wb){
-  row.style.cssText += ';display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-start';
+setTimeout(() => {
+  const row = [...document.querySelectorAll('button')].find(b=>/Предок/i.test(b.textContent))?.parentElement;
+  const nb = document.getElementById('newsBtn'), wb = document.getElementById('whoBtn');
+  if(!row || !nb || !wb) return;
   [nb, wb].forEach(b => {
-    b.style.cssText = 'padding:10px 14px;border-radius:10px;border:1px solid #374151;background:#1f242d;color:#e5e7eb;cursor:pointer;font-weight:600;font-size:14px;margin:0';
+    b.style.cssText = 'padding:10px 14px;border-radius:10px;border:1px solid #374151;background:#1f242d;color:#e5e7eb;cursor:pointer;font-weight:600;font-size:14px';
     row.appendChild(b);
   });
   wb.style.borderColor = '#d4af37'; wb.style.color = '#ffd700';
-}
+}, 300);
+
 
 </script>
 </body>
