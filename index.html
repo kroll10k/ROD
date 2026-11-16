@@ -1616,6 +1616,16 @@ if(!document.getElementById('newsBtn')){
   };
   kSel1.onchange = kSel2.onchange = window.calcKin;
 }
+{
+  setTimeout(() => {
+    const row = [...document.querySelectorAll('button')].find(b=>/Предок/i.test(b.textContent))?.parentElement;
+    if(!row) return;
+    const adm = localStorage.getItem('rod_admin')==='1', usr = localStorage.getItem('rod_user')||'Гость';
+    const add = (id, t, g, fn) => { if(document.getElementById(id)) return; const b=document.createElement('button'); b.id=id; b.textContent=t; b.onclick=fn; b.style.cssText=`padding:10px 14px;border-radius:10px;border:1px solid ${g?'#d4af37':'#374151'};background:#1f242d;color:${g?'#ffd700':'#e5e7eb'};cursor:pointer;font-weight:600;font-size:14px`; row.appendChild(b); };
+    add('whoBtn', adm?'👑 Админ':`👤 ${usr}`, true, () => { const n=prompt('Имя или PIN Админа:',usr==='Гость'?'':usr); if(n){localStorage.setItem('rod_admin',n==='7777'?'1':'0');localStorage.setItem('rod_user',n==='7777'?'Николай':n);location.reload();} });
+    add('kinBtn', '🧬 Кто кому', false, () => { const l=window.persons||window.allPersons||[]; const o=l.map((p,i)=>`<option value="${p.id??i}">${p.name||p.fio}</option>`).join(''); if(window.kSel1){kSel1.innerHTML=kSel2.innerHTML=o;kinMod.style.display='flex';} });
+  }, 500);
+}
 
 
 </script>
