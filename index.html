@@ -1466,78 +1466,95 @@ if(!document.getElementById('newsBtn')){
   b.onclick = () => alert('📜 ЧТО НОВОГО В ЛЕТОПИСИ:\n\n✨ 3D-карточки и живой поиск с золотой подсветкой на схеме.\n🌳 Древо корнями снизу вверх + режим «Веер» + выбор «Точки отсчёта» (можно строить схему от себя или любого родственника).\n🔗 Удобная привязка родных в обе стороны через кнопку «Семья» + фотогалерея.');
   box.prepend(b);
 }
-document.body.insertAdjacentHTML('beforeend',`<div id="nMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:460px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:80vh;overflow-y:auto;font:14px/1.45 sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700;font-size:16px">📜 Что нового и как юзать</b><span onclick="nMod.style.display='none'" style="cursor:pointer;font-size:20px">&times;</span></div><div id="nList"></div></div></div>`);
-nList.innerHTML = `<p><b>1. 3D-карточки и поиск</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — нужный человек загорится золотым на схеме.</p><p><b>2. Древо от себя и «Веер»</b><br>❌ Было: схема только сверху от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Связи и фото</b><br>❌ Было: сухие записи.<br>✅ Стало: галерея и двойная привязка.<br>👉 Юзать: открой карточку и жми «🔗 Семья».</p>`;
-const nb = document.getElementById('newsBtn');
-if(nb) nb.onclick = () => nMod.style.display = 'flex';
-const ADMIN_PIN = '7777';
-let curUser = localStorage.getItem('rod_user') || 'Гость';
-let isAdmin = localStorage.getItem('rod_admin') === '1';
-
-if(!document.getElementById('whoBtn')){
-  const b = document.createElement('button');
-  b.id = 'whoBtn';
-  b.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid #60a5fa;background:#1e293b;color:#93c5fd;cursor:pointer;font-weight:600;margin:4px';
-  b.textContent = isAdmin ? '👑 Админ' : `👤 ${curUser}`;
-  b.onclick = () => {
-    const n = prompt('Введи имя (напр. Лена) или PIN Админа:', curUser==='Гость'?'':curUser);
-    if(!n) return;
-    isAdmin = (n === ADMIN_PIN);
-    curUser = isAdmin ? 'Николай' : n;
-    localStorage.setItem('rod_admin', isAdmin ? '1' : '0');
-    localStorage.setItem('rod_user', curUser);
-    location.reload();
-  };
-  (document.querySelector('header,.header,.controls')||document.body).prepend(b);
+{
+  document.head.insertAdjacentHTML('beforeend', `<style>
+  .card,[class*="card"],[class*="node"]>div:last-child{background:linear-gradient(145deg,#252830,#181a20)!important;box-shadow:0 8px 20px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.08)!important;transition:transform .2s,box-shadow .2s!important}
+  .card:hover,[class*="card"]:hover,[class*="node"]:hover>div:last-child{transform:translateY(-3px)!important;box-shadow:0 12px 26px rgba(0,0,0,.8),0 0 12px rgba(212,175,55,.35)!important}
+  #nMod[style*="none"]{pointer-events:none!important}
+  </style>`);
 }
-if(!isAdmin){
-  setInterval(() => {
-    document.querySelectorAll('button').forEach(btn => {
-      if(/удалить/i.test(btn.textContent) && !btn.dataset.locked){
-        btn.dataset.locked = '1';
-        btn.textContent = '🔒 Удалить (только Админ)';
-        btn.style.opacity = '0.5';
-        btn.onclick = (e) => { e.stopImmediatePropagation(); alert('Удалять карточки может только Админ (Николай). Напиши ему, если нужно убрать дубль.'); return false; };
-      }
-    });
-  }, 500);
+{
+  document.body.insertAdjacentHTML('beforeend', `<div id="nMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:460px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:80vh;overflow-y:auto;font:14px/1.45 sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700;font-size:16px">📜 Что нового и как юзать</b><span onclick="nMod.style.display='none'" style="cursor:pointer;font-size:20px">&times;</span></div><p><b>1. 3D-карточки и поиск:</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + золотая подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — человек подсветится на схеме.</p><p><b>2. Древо от себя и «Веер»:</b><br>❌ Было: схема от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Связи, фото и география:</b><br>❌ Было: сухие записи.<br>✅ Стало: галерея, двойные связи, кладбище и контакты.<br>👉 Юзать: открой карточку, жми «🔗 Семья» или «✏️ Анкета».</p></div></div>`);
 }
-document.addEventListener('click', e => {
-  const btn = e.target.closest('button');
-  if(!btn || !/сохранить/i.test(btn.textContent)) return;
-  const modal = btn.closest('div[style*="fixed"], .modal, [role="dialog"]') || document;
-  const ta = modal.querySelector('textarea');
-  if(!ta) return;
-  const d = new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
-  const mark = `\n✍️ Правка: ${curUser} (${d})`;
-  ta.value = ta.value.replace(/\n✍️ Правка:.*$/m, '') + mark;
-  ta.dispatchEvent(new Event('input', {bubbles:true}));
-}, true);
+{
+  const PIN = '7777';
+  window.curUser = localStorage.getItem('rod_user') || 'Гость';
+  window.isAdmin = localStorage.getItem('rod_admin') === '1';
+  if(!window.isAdmin){
+    setInterval(() => {
+      document.querySelectorAll('button').forEach(b => {
+        if(/удалить/i.test(b.textContent) && !b.dataset.lk){
+          b.dataset.lk = '1'; b.textContent = '🔒 Удалить (Админ)'; b.style.opacity = '0.5';
+          b.onclick = e => { e.stopImmediatePropagation(); alert('Удалять может только Админ (Николай).'); return false; };
+        }
+      });
+    }, 500);
+  }
+}
 {
   setTimeout(() => {
     const row = [...document.querySelectorAll('button')].find(b=>/Предок/i.test(b.textContent))?.parentElement;
-    const b1 = document.getElementById('newsBtn'), b2 = document.getElementById('whoBtn');
-    if(!row || !b1 || !b2) return;
-    [b1, b2].forEach(b => {
-      b.style.cssText = 'padding:10px 14px;border-radius:10px;border:1px solid #374151;background:#1f242d;color:#e5e7eb;cursor:pointer;font-weight:600;font-size:14px';
+    if(!row || document.getElementById('newsBtn')) return;
+    const mk = (id, txt, gold, fn) => {
+      const b = document.createElement('button'); b.id = id; b.textContent = txt; b.onclick = fn;
+      b.style.cssText = `padding:10px 14px;border-radius:10px;border:1px solid ${gold?'#d4af37':'#374151'};background:#1f242d;color:${gold?'#ffd700':'#e5e7eb'};cursor:pointer;font-weight:600;font-size:14px`;
       row.appendChild(b);
+    };
+    mk('newsBtn', '📜 Что нового', false, () => document.getElementById('nMod').style.display = 'flex');
+    mk('whoBtn', window.isAdmin ? '👑 Админ' : `👤 ${window.curUser}`, true, () => {
+      const n = prompt('Имя (напр. Лена) или PIN Админа:', window.curUser==='Гость'?'':window.curUser);
+      if(!n) return;
+      const adm = (n === '7777');
+      localStorage.setItem('rod_admin', adm ? '1' : '0');
+      localStorage.setItem('rod_user', adm ? 'Николай' : n);
+      location.reload();
     });
-    b2.style.borderColor = '#d4af37'; b2.style.color = '#ffd700';
   }, 400);
 }
-setInterval(() => {
-  const inp = [...document.querySelectorAll('input')].find(i => !i.dataset.geo3 && /город|деревн/i.test(i.previousElementSibling?.textContent || i.placeholder));
-  if(!inp) return;
-  inp.dataset.geo3 = '1'; inp.style.display = 'none';
-  if(inp.previousElementSibling) inp.previousElementSibling.textContent = 'ГЕОГРАФИЯ (РОЖДЕНИЕ / ЖИЗНЬ / СТРАНА)';
-  const p = inp.value.split('|').map(s => s.replace(/^.*?:\s*/,'').trim());
-  const box = document.createElement('div');
-  box.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px';
-  box.innerHTML = ['👶 Родился','🏠 Жил','🌍 Страна'].map((ph,idx)=>`<input placeholder="${ph}" value="${p[idx]||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4af37;background:inherit;color:inherit;font-size:13px">`).join('');
-  inp.after(box);
-  box.oninput = () => { const v=[...box.querySelectorAll('input')].map(x=>x.value.trim()); inp.value=`Род.: ${v} | Жив.: ${v[1]} | Страна: ${v[2]}`; inp.dispatchEvent(new Event('input',{bubbles:true})); };
-}, 400);
-
+{
+  setInterval(() => {
+    const inp = [...document.querySelectorAll('input')].find(i => !i.dataset.g3 && /город|деревн/i.test(i.previousElementSibling?.textContent || i.placeholder));
+    if(!inp) return;
+    inp.dataset.g3 = '1'; inp.style.display = 'none';
+    if(inp.previousElementSibling) inp.previousElementSibling.textContent = 'ГЕОГРАФИЯ (РОЖДЕНИЕ / ЖИЗНЬ / СТРАНА)';
+    const p = inp.value.split('|').map(s => s.replace(/^.*?:\s*/,'').trim());
+    const box = document.createElement('div');
+    box.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px';
+    box.innerHTML = ['👶 Родился','🏠 Жил','🌍 Страна'].map((ph,idx)=>`<input placeholder="${ph}" value="${p[idx]||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4af37;background:inherit;color:inherit;font-size:13px">`).join('');
+    inp.after(box);
+    box.oninput = () => { const v=[...box.querySelectorAll('input')].map(x=>x.value.trim()); inp.value=`Род.: ${v[0]} | Жив.: ${v[1]} | Страна: ${v[2]}`; inp.dispatchEvent(new Event('input',{bubbles:true})); };
+  }, 400);
+}
+{
+  setInterval(() => {
+    const ta = [...document.querySelectorAll('textarea')].find(t => t.offsetParent && !t.dataset.ext);
+    if(!ta) return; ta.dataset.ext = '1';
+    const box = document.createElement('div');
+    box.style.cssText = 'display:grid;gap:6px;margin:8px 0';
+    const f = [['maid','👰 Девичья фамилия'],['cit','🛂 Гражданство'],['prof','🛠️ Профессия / награды'],['cont','📱 Телефон / соцсети'],['grav','🪦 Кладбище / участок'],['gps','📍 Координаты (52.63, 29.74)']];
+    box.innerHTML = f.map(([k,p])=>{
+      const m = ta.value.match(new RegExp(p.split(' ')[0]+':\\s*([^\\n]+)'));
+      return `<input data-k="${k}" data-l="${p}" placeholder="${p}" value="${m?m[1].trim():''}" style="padding:9px;border-radius:9px;border:1px solid #374151;background:#161920;color:#fff;font-size:13px">`;
+    }).join('');
+    ta.before(box);
+  }, 400);
+}
+{
+  document.addEventListener('click', e => {
+    if(!/сохранить|обновить|готово/i.test(e.target.textContent||'')) return;
+    const ta = [...document.querySelectorAll('textarea')].find(t => t.offsetParent && t.dataset.ext);
+    if(!ta) return;
+    let txt = ta.value.replace(/\n?(👰|🛂|🛠️|📱|🪦|📍|🗺️|✍️).*$/gm, '').trim();
+    const add = [...ta.previousElementSibling.querySelectorAll('input')].map(i => {
+      if(!i.value.trim()) return '';
+      if(i.dataset.k==='gps') return `📍 Координаты: ${i.value.trim()}\n🗺️ Карта: https://yandex.ru{i.value.trim().split(',').reverse().join(',')}&z=17&l=sat`;
+      return `${i.dataset.l}: ${i.value.trim()}`;
+    }).filter(Boolean).join('\n');
+    const d = new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+    ta.value = [txt, add, `✍️ Правка: ${window.curUser} (${d})`].filter(Boolean).join('\n\n');
+    ta.dispatchEvent(new Event('input', {bubbles:true}));
+  }, true);
+}
 
 
 </script>
