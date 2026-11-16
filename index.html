@@ -1458,6 +1458,14 @@ const nBody = document.querySelector('#newsModal div[style*="line-height"]');
 if(nBody){
   nBody.innerHTML = `<p><b>17.11 — Красота и быстрый поиск:</b><br>❌ Было: плоские карточки, среди десятков имён долго искать нужного человека.<br>✅ Стало: объёмные 3D-карточки и живой поиск с золотой подсветкой прямо на схеме.</p><p><b>16.11 — Древо от себя и «Веер»:</b><br>❌ Было: схема строилась только сверху вниз от одного предка.<br>✅ Стало: корни снизу вверх, режим «☀️ Веер» и выбор «👁️ Точка отсчёта» (можно построить ветку от себя или любого родственника) + смена темы.</p><p><b>15.11 — Живые анкеты:</b><br>❌ Было: сухие записи без связей.<br>✅ Стало: фотогалерея и удобная привязка родных в обе стороны через кнопку «🔗 Семья».</p>`;
 }
+if(!document.getElementById('newsBtn')){
+  const box = document.querySelector('header,.header,.top-bar,.controls') || document.body;
+  const b = document.createElement('button');
+  b.id = 'newsBtn'; b.textContent = '📜 Что нового';
+  b.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid #d4af37;background:#262318;color:#ffd700;cursor:pointer;font-weight:600;margin:4px;z-index:999';
+  b.onclick = () => alert('📜 ЧТО НОВОГО В ЛЕТОПИСИ:\n\n✨ 3D-карточки и живой поиск с золотой подсветкой на схеме.\n🌳 Древо корнями снизу вверх + режим «Веер» + выбор «Точки отсчёта» (можно строить схему от себя или любого родственника).\n🔗 Удобная привязка родных в обе стороны через кнопку «Семья» + фотогалерея.');
+  box.prepend(b);
+}
 
 </script>
 </body>
