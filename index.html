@@ -1392,6 +1392,62 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
 })();
 
 
+(function() {
+  const reliefCss = document.createElement("style");
+  reliefCss.textContent = `
+    .person-card, .card, .media-card, .story-item {
+      background: linear-gradient(155deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 45%, rgba(0,0,0,0.28) 100%), var(--card) !important;
+      border: 1px solid rgba(255,255,255,0.09) !important;
+      border-top: 1px solid rgba(255,255,255,0.22) !important;
+      border-bottom: 2px solid rgba(0,0,0,0.65) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 10px 22px -6px rgba(0,0,0,0.75), 0 4px 8px -2px rgba(0,0,0,0.55), inset 0 1px 1px rgba(255,255,255,0.16), inset 0 -2px 4px rgba(0,0,0,0.45) !important;
+      transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), box-shadow 0.18s ease !important;
+    }
+    .person-card:hover, .media-card:hover { transform: translateY(-4px) scale(1.01) !important; box-shadow: 0 16px 30px -6px rgba(0,0,0,0.85), 0 6px 12px -2px rgba(212,175,55,0.2), inset 0 1px 2px rgba(255,255,255,0.25) !important; }
+    .person-card:active, .media-card:active { transform: translateY(2px) scale(0.99) !important; box-shadow: 0 3px 6px rgba(0,0,0,0.7), inset 0 3px 6px rgba(0,0,0,0.65) !important; }
+    .person-card img, .avatar, .card-avatar { box-shadow: 0 5px 12px rgba(0,0,0,0.65), inset 0 1px 2px rgba(255,255,255,0.3) !important; border: 2px solid rgba(212,175,55,0.55) !important; }
+    body.light .person-card, body.light .card, body.light .media-card { background: linear-gradient(155deg, #ffffff 0%, #f6f2ea 65%, #ebe4d7 100%) !important; border: 1px solid #dfd7c8 !important; border-top: 1px solid #ffffff !important; border-bottom: 2px solid #c9bfae !important; box-shadow: 0 10px 20px -5px rgba(65,52,34,0.22), 0 4px 8px -2px rgba(65,52,34,0.14), inset 0 1px 2px #ffffff !important; }
+    @keyframes schemaPulse { 0%, 100% { filter: drop-shadow(0 0 6px #f59e0b) drop-shadow(0 0 14px rgba(245,158,11,0.85)); } 50% { filter: drop-shadow(0 0 12px #fde047) drop-shadow(0 0 24px rgba(253,224,71,1)); } }
+    .svg-node-dim { opacity: 0.22; transition: opacity 0.2s ease; }
+    .svg-node-hit { opacity: 1 !important; animation: schemaPulse 1.4s infinite ease-in-out; }
+    #schemaTab svg g[onclick*='openPersonCard'] { filter: drop-shadow(0 5px 8px rgba(0,0,0,0.55)); }
+  `;
+  document.head.appendChild(reliefCss);
+  function mountSchemaSearch() {
+    if (document.getElementById("schemaSearchInput")) return;
+    const rootSel = document.getElementById("rootPersonSelect");
+    const host = rootSel ? rootSel.parentNode : document.getElementById("modeSvgBtn")?.parentNode;
+    if (!host) return;
+    const inp = document.createElement("input");
+    inp.type = "search"; inp.id = "schemaSearchInput"; inp.placeholder = "🔍 Найти на схеме..."; inp.autocomplete = "off";
+    inp.style.cssText = "max-width:230px; padding:6px 10px; font-size:0.85rem; margin:0;";
+    host.appendChild(inp);
+    inp.oninput = applySchemaSearch;
+  }
+  function applySchemaSearch() {
+    const inp = document.getElementById("schemaSearchInput");
+    const q = inp ? inp.value.trim().toLowerCase() : "";
+    const wrap = document.getElementById("schemaTab");
+    if (!wrap) return;
+    let firstHit = null;
+    wrap.querySelectorAll("svg g[onclick*='openPersonCard']").forEach(g => {
+      g.classList.remove("svg-node-dim", "svg-node-hit");
+      if (!q) return;
+      const m = (g.getAttribute("onclick") || "").match(/openPersonCard\('([^']+)'\)/);
+      const p = m ? persons.find(x => x.id === m) : null;
+      const hay = p ? (p.name + " " + (p.years || "") + " " + (p.bio || "")).toLowerCase() : g.textContent.toLowerCase();
+      if (hay.includes(q)) { g.classList.add("svg-node-hit"); if (!firstHit) firstHit = g; }
+      else g.classList.add("svg-node-dim");
+    });
+    if (firstHit) firstHit.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+  }
+  const prevRender = window.renderSchema;
+  if (typeof prevRender === "function") {
+    window.renderSchema = function() { prevRender.apply(this, arguments); mountSchemaSearch(); setTimeout(applySchemaSearch, 30); };
+  }
+  setTimeout(mountSchemaSearch, 300);
+})();
 
 </script>
 </body>
