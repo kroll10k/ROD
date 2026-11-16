@@ -1570,6 +1570,52 @@ if(!document.getElementById('newsBtn')){
     });
   }
 }
+{
+  document.body.insertAdjacentHTML('beforeend', `<div id="kinMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:420px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;font:14px sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b style="color:#ffd700;font-size:16px">🧬 Кем мы приходимся?</b><span onclick="kinMod.style.display='none'" style="cursor:pointer;font-size:20px">&times;</span></div><select id="kSel1" style="width:100%;padding:10px;border-radius:8px;background:#12141a;color:#fff;border:1px solid #374151;margin-bottom:8px"></select><select id="kSel2" style="width:100%;padding:10px;border-radius:8px;background:#12141a;color:#fff;border:1px solid #374151;margin-bottom:12px"></select><div id="kRes" style="padding:12px;border-radius:8px;background:#12141a;border:1px dashed #d4af37;min-height:44px">Выбери двух человек сверху...</div></div></div>`);
+}
+{
+  setTimeout(() => {
+    const row = document.getElementById('whoBtn')?.parentElement;
+    if(!row || document.getElementById('kinBtn')) return;
+    const b = document.createElement('button');
+    b.id = 'kinBtn'; b.textContent = '🧬 Кто кому';
+    b.style.cssText = 'padding:10px 14px;border-radius:10px;border:1px solid #374151;background:#1f242d;color:#e5e7eb;cursor:pointer;font-weight:600;font-size:14px';
+    b.onclick = () => {
+      const list = (window.persons || window.allPersons || [...document.querySelectorAll('.card,[class*="card"]')].map((c,i)=>({id:i,name:c.innerText.split('\n').find(s=>s.trim().length>4)||'Без имени'})));
+      const opt = list.map((p,i)=>`<option value="${p.id??i}">${p.name||p.fio}</option>`).join('');
+      kSel1.innerHTML = kSel2.innerHTML = opt;
+      kinMod.style.display = 'flex';
+      if(window.calcKin) window.calcKin();
+    };
+    row.appendChild(b);
+  }, 500);
+}
+{
+  window.calcKin = () => {
+    const list = window.persons || window.allPersons || [];
+    const a = list.find(p => String(p.id) === kSel1.value), b = list.find(p => String(p.id) === kSel2.value);
+    if(!a || !b) return kRes.textContent = 'Нужна база связей (открой вкладку Древо).';
+    if(a.id === b.id) return kRes.textContent = 'Это один и тот же человек 🙂';
+    const anc = (start) => {
+      const m = new Map([[start.id, 0]]), q = [[start, 0]];
+      while(q.length){
+        const [cur, d] = q.shift();
+        [cur.father_id, cur.mother_id, ...(cur.parents||[])].filter(Boolean).forEach(pid => {
+          if(!m.has(pid)){ m.set(pid, d+1); const nx = list.find(x=>x.id===pid); if(nx) q.push([nx, d+1]); }
+        });
+      }
+      return m;
+    };
+    const m1 = anc(a), m2 = anc(b);
+    let best = null, min = 999;
+    m1.forEach((d1, id) => { if(m2.has(id) && d1+m2.get(id) < min){ min = d1+m2.get(id); best = {id, d1, d2: m2.get(id)}; }});
+    if(!best) return kRes.textContent = 'Прямая связь по крови пока не найдена (проверь привязки «Семья»).';
+    const c = list.find(x => x.id === best.id);
+    const rel = best.d1===0 ? `Прямой предок (${best.d2} кол.)` : best.d2===0 ? `Прямой потомок (${best.d1} кол.)` : best.d1===best.d2 ? `${['','Родные','Двоюродные','Троюродные','Четвероюродные'][best.d1]||best.d1+'-юродные'} брат/сестра` : `Родня (${best.d1} и ${best.d2} кол. от общего предка)`;
+    kRes.innerHTML = `<b style="color:#ffd700">${rel}</b><br><span style="font-size:12px;color:#9ca3af">Общий корень: ${c?.name||c?.fio||'Неизвестен'}</span>`;
+  };
+  kSel1.onchange = kSel2.onchange = window.calcKin;
+}
 
 
 </script>
