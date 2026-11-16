@@ -25,7 +25,7 @@
     .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,0.05); color: var(--muted); margin-top: 6px; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
     .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .nav-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--bg-elevated); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; }
+    .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: var(--bg-elevated); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; }
     .tab-btn { background: transparent; border: none; color: var(--muted); padding: 11px 8px; border-radius: 10px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .tab-btn.active { background: var(--gold); color: #111; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; border-radius: 10px; font-size: 0.86rem; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); }
@@ -88,6 +88,21 @@
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gold); color: #111; font-weight: 600; padding: 10px 20px; border-radius: 99px; z-index: 300; transition: 0.25s; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .hidden { display: none !important; }
+            .rel-search-box { position: relative; margin-top: 6px; }
+    .rel-results {
+      max-height: 210px; overflow-y: auto; margin-top: 6px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg); display: flex; flex-direction: column;
+    }
+    .rel-option {
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; gap: 8px; font-size: 0.88rem;
+    }
+    .rel-option:last-child { border-bottom: none; }
+    .rel-option:hover, .rel-option.selected { background: var(--gold-dim); }
+    .rel-option.selected { border-left: 4px solid var(--gold); font-weight: 600; }
+
   </style>
 </head>
 <body>
@@ -287,11 +302,25 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
         <div class="field">
           <label class="label">Колено</label>
-          <select id="fGen">
-            <option value="1">1-е (Дочка)</option><option value="2">2-е (Ваше)</option>
-            <option value="3" selected>3-е (Родители / Тётки)</option><option value="4">4-е (Деды / Бабушки)</option>
-            <option value="5">5-е (Прадеды)</option><option value="6">6-е (Ревизии 1858)</option><option value="7">7-е (Ревизии 1834)</option>
-          </select>
+                    <select id="fGen">
+              <option value="1">1-е (Дочка / Дети ~2020-е)</option>
+              <option value="2">2-е (Ваше ~1990-е)</option>
+              <option value="3" selected>3-е (Родители / Тётки ~1960-е)</option>
+              <option value="4">4-е (Деды / Бабушки ~1930-е)</option>
+              <option value="5">5-е (Прадеды ~1900-е)</option>
+              <option value="6">6-е (Ревизии 1858 / Метрики ~1870-е)</option>
+              <option value="7">7-е (Ревизии 1834 / Метрики ~1840-е)</option>
+              <option value="8">8-е (Метрики PL/BY ~1810–1826)</option>
+              <option value="9">9-е (Речь Посполитая ~1780-е)</option>
+              <option value="10">10-е (XVIII век ~1750-е)</option>
+              <option value="11">11-е (XVIII век ~1720-е)</option>
+              <option value="12">12-е (Начало XVIII в. ~1690-е)</option>
+              <option value="13">13-е (XVII век ~1660-е)</option>
+              <option value="14">14-е (XVII век ~1630-е)</option>
+              <option value="15">15-е (XVII век ~1600-е)</option>
+              <option value="16">16-е+ (XVI век и глубже)</option>
+            </select>
+
         </div>
         <div class="field">
           <label class="label">Линия</label>
@@ -308,19 +337,7 @@
       <div class="field"><label class="label">Портрет (из загруженных фото)</label><select id="fAvatarSelect"><option value="">— Без портрета —</option></select></div>
       <div class="field"><label class="label">Общая биография</label><textarea id="fBio" rows="3"></textarea></div>
       <div class="field"><label class="label">Краткая архивная пометка</label><input type="text" id="fArchive" placeholder="НИАБ Ф.333 Оп.9 или статус поиска"></div>      <div class="field" style="background:var(--bg); border:1px solid var(--border); padding:12px; border-radius:10px;">
-        <label class="label">Привязать родственника (Семья)</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
-          <select id="relRoleSelect">
-            <option value="spouse">💍 Супруг(а)</option>
-            <option value="parent">⬆️ Отец / Мать</option>
-            <option value="child">⬇️ Сын / Дочь</option>
-            <option value="sibling">↔️ Брат / Сестра</option>
-          </select>
-          <select id="relTargetSelect"></select>
-        </div>
-        <button type="button" class="btn btn-sm" id="addRelBtn" style="width:100%;">＋ Добавить связь</button>
-        <div id="editRelsList" style="margin-top:8px; display:flex; flex-direction:column; gap:4px; font-size:0.84rem;"></div>
-      </div>
+       
 
       <button type="submit" class="btn btn-primary" style="width:100%;">Сохранить досье</button>
     </form>
@@ -350,7 +367,15 @@
           <option value="sibling">↔️ Брат / Сестра</option>
         </select>
       </div>
-      <div class="field"><label class="label">Выбрать человека</label><select id="lkTarget"></select></div>
+           <div class="field">
+        <label class="label">Поиск человека (ФИО, фамилия, год или колено)</label>
+        <div class="rel-search-box">
+          <input type="text" id="lkSearchInput" placeholder="Начни вводить: Баранов, Митрахович, 1826..." oninput="filterLinkCandidates()" autocomplete="off">
+          <input type="hidden" id="lkTarget" required>
+          <div class="rel-results" id="lkResultsList"></div>
+        </div>
+      </div>
+
       <button type="submit" class="btn btn-primary" style="width:100%;">Привязать в обе стороны</button>
     </form>
   </div>
@@ -916,11 +941,48 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     toast("Связь удалена");
   }
 
-  document.getElementById("openAddLinkBtn").onclick = () => {
-    const opts = persons.filter(x => x.id !== activePersonId).map(x => '<option value="' + x.id + '">' + x.name + '</option>').join("");
-    document.getElementById("lkTarget").innerHTML = opts;
-    openModal("linkModal");
-  };
+    function filterLinkCandidates() {
+      const q = (document.getElementById("lkSearchInput").value || "").toLowerCase().trim();
+      const selId = document.getElementById("lkTarget").value;
+      const list = document.getElementById("lkResultsList");
+      const matches = persons
+        .filter(x => x.id !== activePersonId)
+        .filter(x => {
+          if (!q) return true;
+          const hay = ((x.name || "") + " " + (x.maiden || "") + " " + (x.years || "") + " " + (x.location || "") + " " + (x.gen || "")).toLowerCase();
+          return hay.includes(q);
+        })
+        .sort((a, b) => (a.gen || 0) - (b.gen || 0) || (a.name || "").localeCompare(b.name || ""));
+
+      if (!matches.length) {
+        list.innerHTML = '<div style="padding:10px;text-align:center;color:var(--muted);font-size:0.84rem;">Никого не найдено</div>';
+        return;
+      }
+      list.innerHTML = matches.map(x => {
+        const activeCls = x.id === selId ? " selected" : "";
+        const sub = [x.maiden ? "урожд. " + x.maiden : "", x.years, x.gen ? x.gen + " кол." : ""].filter(Boolean).join(" • ");
+        return '<div class="rel-option' + activeCls + '" onclick="pickLinkCandidate(\'' + x.id + '\', this)">' +
+          '<div><div>' + x.name + '</div>' + (sub ? '<div style="font-size:0.75rem;color:var(--muted);">' + sub + '</div>' : '') + '</div>' +
+          '</div>';
+      }).join("");
+    }
+
+    function pickLinkCandidate(id, el) {
+      document.getElementById("lkTarget").value = id;
+      const person = persons.find(x => x.id === id);
+      if (person) document.getElementById("lkSearchInput").value = person.name;
+      document.querySelectorAll("#lkResultsList .rel-option").forEach(n => n.classList.remove("selected"));
+      if (el) el.classList.add("selected");
+    }
+
+    document.getElementById("openAddLinkBtn").onclick = () => {
+      document.getElementById("lkSearchInput").value = "";
+      document.getElementById("lkTarget").value = "";
+      filterLinkCandidates();
+      openModal("linkModal");
+      setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
+    };
+
   document.getElementById("linkForm").onsubmit = async (e) => {
     e.preventDefault();
     const p1 = persons.find(x => x.id === activePersonId);
