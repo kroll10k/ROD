@@ -206,7 +206,8 @@
       <button class="btn btn-sm" id="editPersonBtn">✏️ Анкета</button>
       <button class="btn btn-primary btn-sm" id="openAddEventBtn">＋ Веха жизни</button>
             <button class="btn btn-sm" id="openAddSourceBtn">📜 Источник НИАБ</button>
-      <button class="btn btn-sm" id="openAddLinkBtn">🔗 Семья</button>    <button class="btn btn-danger btn-sm" id="deletePersonBtn">🗑 Удалить</button>
+      <button class="btn btn-sm" id="openAddLinkBtn" onclick="openFamilyLinkModal()">🔗 Семья</button>
+
 
     </div>
     <div id="mQuoteBlock" class="hidden" style="font-family:Georgia,serif; font-style:italic; color:var(--gold); background:var(--gold-dim); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:0.95rem;"></div>
@@ -977,7 +978,18 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       if (el) el.classList.add("selected");
     }
 
-      document.getElementById("openAddLinkBtn").onclick = () => {
+       function openFamilyLinkModal() {
+   document.getElementById("lkSearchInput").value = "";
+   document.getElementById("lkTarget").value = "";
+   filterLinkCandidates();
+   const lm = document.getElementById("linkModal");
+   lm.classList.remove("hidden");
+   lm.classList.add("open");
+   lm.style.display = "flex";
+   lm.style.zIndex = "99999";
+   setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
+ }
+
       document.getElementById("lkSearchInput").value = "";
       document.getElementById("lkTarget").value = "";
       filterLinkCandidates();
