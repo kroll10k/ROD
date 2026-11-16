@@ -1555,6 +1555,21 @@ if(!document.getElementById('newsBtn')){
     ta.dispatchEvent(new Event('input', {bubbles:true}));
   }, true);
 }
+{
+  if(window.innerWidth <= 768 && !document.getElementById('mBar')){
+    document.body.style.paddingBottom = '68px';
+    document.body.insertAdjacentHTML('beforeend', `<div id="mBar" style="position:fixed;bottom:0;left:0;right:0;height:58px;background:#161920;border-top:1px solid #d4af37;display:grid;grid-template-columns:repeat(4,1fr);z-index:9998;font:600 12px sans-serif"><button data-t="Древо">🌳 Древо</button><button data-t="Схема">🕸️ Схема</button><button data-t="Поиск">🔍 Поиск</button><button data-t="Предок" style="color:#ffd700">➕ Предок</button></div>`);
+    mBar.querySelectorAll('button').forEach(b => {
+      b.style.cssText += ';background:none;border:none;color:'+(b.style.color||'#e5e7eb')+';cursor:pointer';
+      b.onclick = () => {
+        const t = b.dataset.t;
+        if(t==='Поиск'){ const i=document.querySelector('input[placeholder*="Поиск"]'); if(i){i.scrollIntoView({behavior:'smooth'});i.focus();} return; }
+        const el = [...document.querySelectorAll('button,div')].find(x => x.children.length===0 && x.textContent.includes(t));
+        if(el) el.click();
+      };
+    });
+  }
+}
 
 
 </script>
