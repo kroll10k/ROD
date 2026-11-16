@@ -1470,6 +1470,38 @@ document.body.insertAdjacentHTML('beforeend',`<div id="nMod" onclick="if(event.t
 nList.innerHTML = `<p><b>1. 3D-карточки и поиск</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — нужный человек загорится золотым на схеме.</p><p><b>2. Древо от себя и «Веер»</b><br>❌ Было: схема только сверху от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Связи и фото</b><br>❌ Было: сухие записи.<br>✅ Стало: галерея и двойная привязка.<br>👉 Юзать: открой карточку и жми «🔗 Семья».</p>`;
 const nb = document.getElementById('newsBtn');
 if(nb) nb.onclick = () => nMod.style.display = 'flex';
+const ADMIN_PIN = '7777';
+let curUser = localStorage.getItem('rod_user') || 'Гость';
+let isAdmin = localStorage.getItem('rod_admin') === '1';
+
+if(!document.getElementById('whoBtn')){
+  const b = document.createElement('button');
+  b.id = 'whoBtn';
+  b.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid #60a5fa;background:#1e293b;color:#93c5fd;cursor:pointer;font-weight:600;margin:4px';
+  b.textContent = isAdmin ? '👑 Админ' : `👤 ${curUser}`;
+  b.onclick = () => {
+    const n = prompt('Введи имя (напр. Лена) или PIN Админа:', curUser==='Гость'?'':curUser);
+    if(!n) return;
+    isAdmin = (n === ADMIN_PIN);
+    curUser = isAdmin ? 'Николай' : n;
+    localStorage.setItem('rod_admin', isAdmin ? '1' : '0');
+    localStorage.setItem('rod_user', curUser);
+    location.reload();
+  };
+  (document.querySelector('header,.header,.controls')||document.body).prepend(b);
+}
+if(!isAdmin){
+  setInterval(() => {
+    document.querySelectorAll('button').forEach(btn => {
+      if(/удалить/i.test(btn.textContent) && !btn.dataset.locked){
+        btn.dataset.locked = '1';
+        btn.textContent = '🔒 Удалить (только Админ)';
+        btn.style.opacity = '0.5';
+        btn.onclick = (e) => { e.stopImmediatePropagation(); alert('Удалять карточки может только Админ (Николай). Напиши ему, если нужно убрать дубль.'); return false; };
+      }
+    });
+  }, 500);
+}
 
 </script>
 </body>
