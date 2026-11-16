@@ -1448,6 +1448,12 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
   }
   setTimeout(mountSchemaSearch, 300);
 })();
+const fixCss = `<style>
+.card,[class*="card"],[class*="node"]>div:last-child{background:linear-gradient(145deg,#252830,#181a20)!important;box-shadow:0 8px 20px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.08)!important;transition:transform .2s,box-shadow .2s!important}
+.card:hover,[class*="card"]:hover,[class*="node"]:hover>div:last-child{transform:translateY(-3px)!important;box-shadow:0 12px 26px rgba(0,0,0,.8),0 0 12px rgba(212,175,55,.35)!important}
+#newsModal[style*="none"]{pointer-events:none!important}
+</style>`;
+document.head.insertAdjacentHTML('beforeend', fixCss);
 
 </script>
 </body>
