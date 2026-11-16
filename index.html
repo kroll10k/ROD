@@ -1055,8 +1055,7 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     const isLight = document.body.classList.contains("light");
     const bgCol = isLight ? "#f4f1ea" : "#0d1015", cardBg = isLight ? "#ffffff" : "#161b24";
     const nameCol = isLight ? "#1c1917" : "#f3f4f6", subCol = isLight ? "#6b7280" : "#9ca3af", lineCol = isLight ? "#b48a3e" : "#d4af37";
-    const gens = [...new Set(persons.map(p => p.gen))].    const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => a - b);
-
+    const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => b - a);
     const nodeW = 215, nodeH = 96, gapX = 28, gapY = 115, coords = {}, rows = [];
     let maxRowWidth = 820;
     gens.forEach(g => {
@@ -1114,7 +1113,7 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
         if (lk.role !== "child" && lk.role !== "parent") return;
         const c2 = coords[lk.id]; if (!c2) return;
         const parId = lk.role === "child" ? p.id : lk.id, chdId = lk.role === "child" ? lk.id : p.id;
-        const parC = coords[parId], chdC = coords[chdId], startPt = coupleMid[parId] || { x: parC.x, y: parC.top }, endY = chdC.bottom;
+        const parC = coords[parId], chdC = coords[chdId], startPt = coupleMid[parId] || { x: parC.x, y: parC.bottom }, endY = chdC.top;
         const key = coupleMid[parId] ? [parId, "couple", chdId].join("__") : [parId, chdId].join("__");
         if (drawn.has(key)) return; drawn.add(key);
         const elbowY = (startPt.y + endY) / 2;
