@@ -979,53 +979,40 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     else renderSvgBlueprint();
   }
 
-  function renderVisGraph() {
+    function renderVisGraph() {
     const container = document.getElementById("graphCanvasWrap");
-    if (typeof vis === "undefined") {
-      container.innerHTML = '<div style="padding:20px; color:var(--muted);">Нет интернета для графа. Переключись на «📐 Чертёж SVG» — он работает полностью автономно!</div>';
-      return;
-    }
-    const branchColors = { direct: "#d4af37", wife: "#10b981", side: "#8b5cf6", union: "#38bdf8" };
-    const nodes = persons.map(p => ({
-      id: p.id,
-      label: p.name + "\n(" + (p.years || p.gen + "-е колено") + ")",
-      level: 10 - (p.gen || 1),
-      shape: "box",
-      margin: 10,
-      font: { color: "#f3f4f6", size: 13, face: "system-ui" },
-      color: { background: "#1b202c", border: branchColors[p.branch] || "#d4af37", highlight: { background: "#2a3244", border: "#fff" } },
-      borderWidth: 2
-    }));
-    const edges = [];
-    const seen = new Set();
-    persons.forEach(p => {
-      const links = (getMeta(p).links || []);
-      links.forEach(lk => {
-        const key = [p.id, lk.id].sort().join("_");
-        if (seen.has(key)) return;
-        seen.add(key);
-        const isSpouse = lk.role === "spouse";
-        edges.push({
-          from: lk.role === "parent" ? lk.id : p.id,
-          to: lk.role === "parent" ? p.id : lk.id,
-          dashes: isSpouse,
-          color: { color: isSpouse ? "#10b981" : "#64748b" },
-          width: isSpouse ? 2 : 1.5,
-          arrows: isSpouse ? "" : "to"
-        });
-      });
-    });
-    const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
-    const options = {
-      layout: { hierarchical: { direction: "UD", sortMethod: "directed", levelSeparation: 110, nodeSpacing: 160 } },
-      physics: false,
-      interaction: { dragNodes: true, zoomView: true, dragView: true }
+    container.innerHTML = "";
+    container.style.position = "relative";
+    container.style.touchAction = "none";
+    renderSvgBlueprint();
+    const svgOrig = document.getElementById("familySvgEl");
+    if (!svgOrig) return;
+    const clone = svgOrig.cloneNode(true);
+    clone.id = "interactiveSvgEl";
+    clone.style.transformOrigin = "0 0";
+    container.appendChild(clone);
+
+    let scale = 0.55, panX = 10, panY = 20, dragging = false, startX = 0, startY = 0, lastDist = 0;
+    const updateTransform = () => { clone.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; };
+    updateTransform();
+
+    container.onpointerdown = (e) => { dragging = true; startX = e.clientX - panX; startY = e.clientY - panY; };
+    container.onpointermove = (e) => { if (!dragging) return; panX = e.clientX - startX; panY = e.clientY - startY; updateTransform(); };
+    container.onpointerup = () => { dragging = false; };
+    container.ontouchmove = (e) => {
+      if (e.touches.length === 2) {
+        dragging = false;
+        const dx = e.touches.clientX - e.touches.clientX;
+        const dy = e.touches.clientY - e.touches.clientY;
+        const dist = Math.hypot(dx, dy);
+        if (lastDist) scale = Math.min(2.5, Math.max(0.25, scale * (dist / lastDist)));
+        lastDist = dist;
+        updateTransform();
+      }
     };
-    networkInstance = new vis.Network(container, data, options);
-    networkInstance.on("click", (params) => {
-      if (params.nodes.length > 0) openPersonCard(params.nodes);
-    });
+    container.ontouchend = () => { lastDist = 0; };
   }
+
     function renderSvgBlueprint() {
     const wrap = document.getElementById("svgSchemaWrap");
     const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => b - a);
@@ -1074,25 +1061,32 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     wrap.innerHTML = '<svg id="familySvgEl" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#0d1015;">' + lines + svgBody + '</svg>';
   }
 
-
   function downloadSchemaFile() {
-    if (schemaMode === "svg") {
-      const svgEl = document.getElementById("familySvgEl");
-      if (!svgEl) return;
-      const blob = new Blob([svgEl.outerHTML], { type: "image/svg+xml;charset=utf-8" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "drevo_roda_chertezh.svg";
-      a.click();
-    } else {
-      const canvas = document.querySelector("#graphCanvasWrap canvas");
-      if (!canvas) return toast("Переключись в чертёж SVG для скачивания");
+    const svgEl = document.getElementById("familySvgEl");
+    if (!svgEl) return toast("Сначала открой чертёж");
+    const svgData = new XMLSerializer().serializeToString(svgEl);
+    const img = new Image();
+    const scale = 2;
+    const w = parseInt(svgEl.getAttribute("width")) * scale;
+    const h = parseInt(svgEl.getAttribute("height")) * scale;
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#0d1015";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
       const a = document.createElement("a");
       a.href = canvas.toDataURL("image/png");
-      a.download = "drevo_roda_graph.png";
+      a.download = "drevo_roda.png";
       a.click();
-    }
+      toast("Картинка PNG сохранена!");
+    };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgData);
   }
+
+  
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
