@@ -206,7 +206,8 @@
       <button class="btn btn-sm" id="editPersonBtn">✏️ Анкета</button>
       <button class="btn btn-primary btn-sm" id="openAddEventBtn">＋ Веха жизни</button>
             <button class="btn btn-sm" id="openAddSourceBtn">📜 Источник НИАБ</button>
-      <button class="btn btn-sm" id="openAddLinkBtn">🔗 Семья</button>
+      <button class="btn btn-sm" id="openAddLinkBtn">🔗 Семья</button>    <button class="btn btn-danger btn-sm" id="deletePersonBtn">🗑 Удалить</button>
+
     </div>
     <div id="mQuoteBlock" class="hidden" style="font-family:Georgia,serif; font-style:italic; color:var(--gold); background:var(--gold-dim); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:0.95rem;"></div>
     <div id="mLinksBlock" class="hidden" style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:14px;">
@@ -1024,6 +1025,25 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       block.classList.add("hidden");
     }
   };
+          document.getElementById("deletePersonBtn").onclick = async () => {
+      const p = persons.find(x => x.id === activePersonId);
+      if (!p) return;
+      if (!confirm("Точно удалить «" + p.name + "» из летописи? Это действие нельзя отменить.")) return;
+      persons = persons.filter(x => x.id !== p.id);
+      persons.forEach(other => {
+        const meta = getMeta(other);
+        if (meta && Array.isArray(meta.links)) {
+          meta.links = meta.links.filter(l => l.id !== p.id);
+        }
+      });
+      localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+      try { await sbFetch("persons", "DELETE", null, "?id=eq." + p.id); } catch (err) {}
+      closeModal("personModal");
+      if (typeof renderTree === "function") renderTree();
+      if (typeof renderAll === "function") renderAll();
+      toast("Запись удалена");
+    };
+
   let schemaMode = "graph";
   let networkInstance = null;
 
