@@ -24,12 +24,9 @@
     h1 { font-family: Georgia, serif; font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.1; color: #fff; }
     .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,0.05); color: var(--muted); margin-top: 6px; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
-       body.light { --bg: #f4f1ea; --bg-elevated: #ffffff; --card: #faf8f5; --border: #e5e0d8; --border-light: #d6cfc2; --text: #1c1917; --muted: #6b7280; --gold: #a67c00; --gold-dim: rgba(166, 124, 0, 0.12); }
-    body.light header { background: linear-gradient(145deg, #ffffff, #efeae1); }
-    .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: var(--bg-elevated); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; }
-    .tab-btn { background: transparent; border: none; color: var(--muted); padding: 10px 6px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
-
-   
+    .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: var(--bg-elevated); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; }
+    .tab-btn { background: transparent; border: none; color: var(--muted); padding: 11px 8px; border-radius: 10px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .tab-btn.active { background: var(--gold); color: #111; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; border-radius: 10px; font-size: 0.86rem; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); }
     .btn:active { transform: scale(0.97); }
@@ -123,8 +120,6 @@
       <button class="btn btn-primary" onclick="openAddPerson()">＋ Предок</button>
       <button class="btn" id="shareLinkBtn">🔗 Родне</button>
       <button class="btn" onclick="openModal('cloudModal')">⚙ Облако</button>
-               <button class="btn" id="themeToggleBtn" onclick="toggleTheme()">☀️</button>
-   
     </div>
   </header>
 
@@ -211,8 +206,7 @@
       <button class="btn btn-sm" id="editPersonBtn">✏️ Анкета</button>
       <button class="btn btn-primary btn-sm" id="openAddEventBtn">＋ Веха жизни</button>
             <button class="btn btn-sm" id="openAddSourceBtn">📜 Источник НИАБ</button>
-      <button class="btn btn-sm" id="openAddLinkBtn" onclick="openFamilyLinkModal()">🔗 Семья</button>
-
+      <button class="btn btn-sm" id="openAddLinkBtn">🔗 Семья</button>    <button class="btn btn-danger btn-sm" id="deletePersonBtn">🗑 Удалить</button>
 
     </div>
     <div id="mQuoteBlock" class="hidden" style="font-family:Georgia,serif; font-style:italic; color:var(--gold); background:var(--gold-dim); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:0.95rem;"></div>
@@ -364,8 +358,7 @@
   </div>
 </div><div class="backdrop" id="linkModal">
   <div class="modal">
-        <div class="modal-head"><h3>Привязать родственника</h3><button class="close-btn" onclick="document.getElementById('linkModal').style.display='none'; closeModal('linkModal')">&times;</button></div>
-
+    <div class="modal-head"><h3>Привязать родственника</h3><button class="close-btn" onclick="closeModal('linkModal')">&times;</button></div>
     <form id="linkForm">
       <div class="field"><label class="label">Кем приходится?</label>
         <select id="lkRole">
@@ -983,20 +976,13 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       if (el) el.classList.add("selected");
     }
 
-       function openFamilyLinkModal() {
-   document.getElementById("lkSearchInput").value = "";
-   document.getElementById("lkTarget").value = "";
-   filterLinkCandidates();
-   const lm = document.getElementById("linkModal");
-   lm.classList.remove("hidden");
-   lm.classList.add("open");
-   lm.style.display = "flex";
-   lm.style.zIndex = "99999";
-   setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
- }
-
-
-
+    document.getElementById("openAddLinkBtn").onclick = () => {
+      document.getElementById("lkSearchInput").value = "";
+      document.getElementById("lkTarget").value = "";
+      filterLinkCandidates();
+      openModal("linkModal");
+      setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
+    };
 
   document.getElementById("linkForm").onsubmit = async (e) => {
     e.preventDefault();
@@ -1013,11 +999,9 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       await sbFetch("persons", "PATCH", { stories: p2.stories }, "?id=eq." + p2.id);
     } catch (err) {}
     closeModal("linkModal");
-           
-   document.getElementById("linkModal").style.display = "none";
-   openPersonCard(p1.id);
-   toast("Связано в обе стороны!");
- };
+    openPersonCard(p1.id);
+    toast("Связано в обе стороны!");
+  };
 
   const baseOpenCard = openPersonCard;
   openPersonCard = function(id) {
@@ -1086,79 +1070,79 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     const height = gens.length * (nodeH + gapY) + 220;
     const cx = width / 2;
     const coords = {};
-  function buildTreeSvg(svgId) {
-    const isLight = document.body.classList.contains("light");
-    const bgCol = isLight ? "#f4f1ea" : "#0d1015", cardBg = isLight ? "#ffffff" : "#161b24";
-    const nameCol = isLight ? "#1c1917" : "#f3f4f6", subCol = isLight ? "#6b7280" : "#9ca3af", lineCol = isLight ? "#b48a3e" : "#d4af37";
-    const gens = [...new Set(persons.map(p => p.gen))].sort((a, b) => b - a);
-    const nodeW = 215, nodeH = 96, gapX = 28, gapY = 115, coords = {}, rows = [];
-    let maxRowWidth = 820;
-    gens.forEach(g => {
-      const raw = persons.filter(p => p.gen === g), ordered = [], visited = new Set();
-      raw.forEach(p => {
-        if (visited.has(p.id)) return;
-        visited.add(p.id); ordered.push(p);
-        const spLink = (getMeta(p).links || []).find(l => l.role === "spouse");
-        if (spLink) { const sp = raw.find(x => x.id === spLink.id); if (sp && !visited.has(sp.id)) { visited.add(sp.id); ordered.push(sp); } }
-      });
-      rows.push({ gen: g, list: ordered });
-      const w = ordered.length * (nodeW + gapX) + 120;
-      if (w > maxRowWidth) maxRowWidth = w;
-    });
-            const width = maxRowWidth, height = rows.length * (nodeH + gapY) + 110;
-    const branchIcons = { direct: "👑", wife: "💚", side: "🌿", union: "💍" };
+
+    let defs = '<defs>' +
+      '<radialGradient id="canopyGrad" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#1b3a2b" stop-opacity="0.65"/><stop offset="65%" stop-color="#0f241b" stop-opacity="0.35"/><stop offset="100%" stop-color="#0d1015" stop-opacity="0"/></radialGradient>' +
+      '<linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#3a2618"/><stop offset="50%" stop-color="#5c3d28"/><stop offset="100%" stop-color="#2b1b10"/></linearGradient>' +
+      '</defs>';
+
+    let bgArt = '<ellipse cx="' + cx + '" cy="' + (height * 0.44) + '" rx="' + (width * 0.46) + '" ry="' + (height * 0.42) + '" fill="url(#canopyGrad)"/>';
+    bgArt += '<path d="M ' + (cx - 48) + ' ' + (height - 30) + ' Q ' + (cx - 26) + ' ' + (height * 0.55) + ' ' + (cx - 16) + ' ' + (height * 0.18) + ' L ' + (cx + 16) + ' ' + (height * 0.18) + ' Q ' + (cx + 26) + ' ' + (height * 0.55) + ' ' + (cx + 48) + ' ' + (height - 30) + ' Z" fill="url(#trunkGrad)" opacity="0.85"/>';
+    bgArt += '<path d="M ' + (cx - 42) + ' ' + (height - 35) + ' Q ' + (cx - 130) + ' ' + (height - 15) + ' ' + (cx - 210) + ' ' + (height - 5) + '" stroke="#4a3220" stroke-width="10" fill="none" stroke-linecap="round"/>';
+    bgArt += '<path d="M ' + (cx + 42) + ' ' + (height - 35) + ' Q ' + (cx + 130) + ' ' + (height - 15) + ' ' + (cx + 210) + ' ' + (height - 5) + '" stroke="#4a3220" stroke-width="10" fill="none" stroke-linecap="round"/>';
+
     let nodesSvg = "";
-    rows.forEach((row, rIdx) => {
-      const rowW = row.list.length * (nodeW + gapX) - gapX, startX = (width - rowW) / 2, y = 45 + rIdx * (nodeH + gapY);
-      nodesSvg += '<text x="24" y="' + (y - 12) + '" fill="' + subCol + '" font-size="11" font-weight="bold" font-family="sans-serif">' + row.gen + '-Е КОЛЕНО</text>';
-      row.list.forEach((p, cIdx) => {
-        const x = startX + cIdx * (nodeW + gapX), px = x + nodeW / 2, py = y + 26;
+    gens.forEach((g, rIdx) => {
+      const rowPersons = persons.filter(p => p.gen === g);
+      const rowW = rowPersons.length * (nodeW + gapX) - gapX;
+      const startX = Math.max(40, (width - rowW) / 2);
+      const y = height - 150 - rIdx * (nodeH + gapY);
+
+      rowPersons.forEach((p, cIdx) => {
+        const x = startX + cIdx * (nodeW + gapX);
+        const px = x + nodeW / 2;
+        const py = y + 26;
         coords[p.id] = { x: px, y: py, top: y, bottom: y + nodeH };
-        const stroke = p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : lineCol));
-        const meta = getMeta(p), clipId = "clip_" + p.id.replace(/[^a-zA-Z0-9]/g, ""), icon = branchIcons[p.branch] || "🌳";
-        const parts = p.name.trim().split(" ");
-        const line1 = parts.length > 2 ? parts.slice(0, 2).join(" ") : p.name;
-        const line2 = parts.length > 2 ? parts.slice(2).join(" ") : (p.years || row.gen + "-е колено");
-        const boxW = Math.max(185, Math.min(235, Math.max(line1.length, line2.length) * 7.2 + 22)), boxX = px - boxW / 2;
+        const stroke = p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : "#d4af37"));
+        const meta = getMeta(p);
+        const clipId = "clip_" + p.id.replace(/[^a-zA-Z0-9]/g, "");
+        const initials = p.name.split(" ").map(w => w[0] || "").slice(0, 2).join("");
+
         nodesSvg += '<g style="cursor:pointer" onclick="openPersonCard(\'' + p.id + '\')">';
         if (meta.avatar) {
-          nodesSvg += '<clipPath id="' + clipId + '"><circle cx="' + px + '" cy="' + py + '" r="23"/></clipPath><circle cx="' + px + '" cy="' + py + '" r="25" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="2.5"/><image href="' + meta.avatar + '" x="' + (px - 23) + '" y="' + (py - 23) + '" width="46" height="46" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + clipId + ')"/>';
+          nodesSvg += '<clipPath id="' + clipId + '"><circle cx="' + px + '" cy="' + py + '" r="23"/></clipPath>';
+          nodesSvg += '<circle cx="' + px + '" cy="' + py + '" r="25" fill="#181c24" stroke="' + stroke + '" stroke-width="2.5"/>';
+          nodesSvg += '<image href="' + meta.avatar + '" x="' + (px - 23) + '" y="' + (py - 23) + '" width="46" height="46" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + clipId + ')"/>';
         } else {
-          nodesSvg += '<circle cx="' + px + '" cy="' + py + '" r="24" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="2.2"/><text x="' + px + '" y="' + (py + 7) + '" text-anchor="middle" font-size="19">' + icon + '</text>';
+          nodesSvg += '<circle cx="' + px + '" cy="' + py + '" r="24" fill="#1b222c" stroke="' + stroke + '" stroke-width="2.5"/>';
+          nodesSvg += '<text x="' + px + '" y="' + (py + 5) + '" text-anchor="middle" fill="' + stroke + '" font-size="13" font-weight="bold" font-family="Georgia,serif">' + initials + '</text>';
         }
-        nodesSvg += '<rect x="' + boxX + '" y="' + (y + 52) + '" width="' + boxW + '" height="42" rx="8" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="1.4"/><text x="' + px + '" y="' + (y + 68) + '" text-anchor="middle" fill="' + nameCol + '" font-size="11" font-weight="bold" font-family="sans-serif">' + line1 + '</text><text x="' + px + '" y="' + (y + 84) + '" text-anchor="middle" fill="' + subCol + '" font-size="9.5" font-family="sans-serif">' + line2 + '</text></g>';
+        nodesSvg += '<rect x="' + x + '" y="' + (y + 52) + '" width="' + nodeW + '" height="34" rx="7" fill="rgba(18,22,29,0.92)" stroke="' + stroke + '" stroke-width="1.2"/>';
+        nodesSvg += '<text x="' + px + '" y="' + (y + 66) + '" text-anchor="middle" fill="#f3f4f6" font-size="10" font-weight="bold" font-family="sans-serif">' + p.name.slice(0, 25) + '</text>';
+        nodesSvg += '<text x="' + px + '" y="' + (y + 80) + '" text-anchor="middle" fill="#9ca3af" font-size="8.5" font-family="sans-serif">' + (p.years || g + "-е колено").slice(0, 26) + '</text>';
+        nodesSvg += '</g>';
       });
     });
-    let lines = "";
-    const drawn = new Set(), coupleMid = {};
+    let branches = "";
+    const drawn = new Set();
     persons.forEach(p => {
-      const c1 = coords[p.id]; if (!c1) return;
-      (getMeta(p).links || []).forEach(lk => {
-        if (lk.role !== "spouse") return;
-        const c2 = coords[lk.id]; if (!c2) return;
-        const key = [p.id, lk.id].sort().join("__"), mx = (c1.x + c2.x) / 2, my = (c1.y + c2.y) / 2;
-        coupleMid[p.id] = { x: mx, y: my };
-        if (drawn.has(key)) return; drawn.add(key);
-        lines += '<line x1="' + c1.x + '" y1="' + c1.y + '" x2="' + c2.x + '" y2="' + c2.y + '" stroke="#10b981" stroke-width="2.5" stroke-dasharray="5,4"/><circle cx="' + mx + '" cy="' + my + '" r="4.5" fill="#10b981"/>';
+      const c1 = coords[p.id];
+      if (!c1) return;
+      const links = getMeta(p).links || [];
+      if (!links.length) {
+        const ctrlY = (c1.y + height * 0.6) / 2;
+        branches += '<path d="M ' + cx + ' ' + (height * 0.72) + ' Q ' + cx + ' ' + ctrlY + ' ' + c1.x + ' ' + c1.y + '" fill="none" stroke="#5c3d28" stroke-width="3" stroke-opacity="0.45"/>';
+      }
+      links.forEach(lk => {
+        const c2 = coords[lk.id];
+        if (!c2) return;
+        const key = [p.id, lk.id].sort().join("__");
+        if (drawn.has(key)) return;
+        drawn.add(key);
+        if (lk.role === "spouse") {
+          branches += '<path d="M ' + c1.x + ' ' + c1.y + ' Q ' + ((c1.x + c2.x) / 2) + ' ' + (c1.y - 22) + ' ' + c2.x + ' ' + c2.y + '" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="4,3"/>';
+        } else if (lk.role === "child" || lk.role === "parent") {
+          const par = lk.role === "child" ? c1 : c2;
+          const chd = lk.role === "child" ? c2 : c1;
+          const midY = (par.y + chd.y) / 2;
+          branches += '<path d="M ' + par.x + ' ' + par.y + ' C ' + par.x + ' ' + midY + ', ' + chd.x + ' ' + midY + ', ' + chd.x + ' ' + chd.y + '" fill="none" stroke="#8b5e34" stroke-width="4" stroke-linecap="round"/>';
+          branches += '<path d="M ' + par.x + ' ' + par.y + ' C ' + par.x + ' ' + midY + ', ' + chd.x + ' ' + midY + ', ' + chd.x + ' ' + chd.y + '" fill="none" stroke="#d4af37" stroke-width="1.2" stroke-opacity="0.7"/>';
+        }
       });
     });
-    persons.forEach(p => {
-      const c1 = coords[p.id]; if (!c1) return;
-      (getMeta(p).links || []).forEach(lk => {
-        if (lk.role !== "child" && lk.role !== "parent") return;
-        const c2 = coords[lk.id]; if (!c2) return;
-        const parId = lk.role === "child" ? p.id : lk.id, chdId = lk.role === "child" ? lk.id : p.id;
-        const parC = coords[parId], chdC = coords[chdId], startPt = coupleMid[parId] || { x: parC.x, y: parC.bottom }, endY = chdC.top;
-        const key = coupleMid[parId] ? [parId, "couple", chdId].join("__") : [parId, chdId].join("__");
-        if (drawn.has(key)) return; drawn.add(key);
-        const elbowY = (startPt.y + endY) / 2;
-        lines += '<path d="M ' + startPt.x + ' ' + startPt.y + ' L ' + startPt.x + ' ' + elbowY + ' L ' + chdC.x + ' ' + elbowY + ' L ' + chdC.x + ' ' + endY + '" fill="none" stroke="' + lineCol + '" stroke-width="1.8" stroke-opacity="0.75"/>';
-      });
-    });
-    return '<svg id="' + svgId + '" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:' + bgCol + '; display:block;">' + lines + nodesSvg + '</svg>';
+
+    return '<svg id="' + svgId + '" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:#0d1015; display:block;">' + defs + bgArt + branches + nodesSvg + '</svg>';
   }
-
-
 
   function renderSvgBlueprint() {
     document.getElementById("svgSchemaWrap").innerHTML = buildTreeSvg("familySvgEl");
@@ -1230,51 +1214,6 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       if (btn.dataset.tab === "schemaTab") setTimeout(renderSchema, 50);
     });
   });
-  const roleNames = { spouse: "💍 Супруг(а)", parent: "⬆️ Родитель", child: "⬇️ Ребёнок", sibling: "↔️ Брат / Сестра" };
-  const backRole = { spouse: "spouse", parent: "child", child: "parent", sibling: "sibling" };
-  function pushLink(personObj, role, targetId) {
-    personObj.stories = personObj.stories || []; let meta = personObj.stories.find(s => s.type === "meta");
-    if (!meta) { meta = { type: "meta" }; personObj.stories.unshift(meta); }
-    meta.links = meta.links || []; if (!meta.links.some(x => x.role === role && x.id === targetId)) meta.links.push({ role: role, id: targetId });
-  }
-  async function removeLink(idx) {
-    const p = persons.find(x => x.id === activePersonId), meta = p ? getMeta(p) : null; if (!meta || !meta.links) return;
-    meta.links.splice(idx, 1); localStorage.setItem("chronicle_persons", JSON.stringify(persons));
-    try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
-    openPersonCard(p.id); toast("Связь удалена");
-  }
-  document.getElementById("openAddLinkBtn").onclick = () => {
-    document.getElementById("lkTarget").innerHTML = persons.filter(x => x.id !== activePersonId).map(x => '<option value="' + x.id + '">' + x.name + '</option>').join("");
-    openModal("linkModal");
-  };
-  document.getElementById("linkForm").onsubmit = async (e) => {
-    e.preventDefault();
-    const p1 = persons.find(x => x.id === activePersonId), role = document.getElementById("lkRole").value, p2 = persons.find(x => x.id === document.getElementById("lkTarget").value);
-    if (!p1 || !p2) return;
-    pushLink(p1, role, p2.id); pushLink(p2, backRole[role], p1.id); localStorage.setItem("chronicle_persons", JSON.stringify(persons));
-    try { await sbFetch("persons", "PATCH", { stories: p1.stories }, "?id=eq." + p1.id); await sbFetch("persons", "PATCH", { stories: p2.stories }, "?id=eq." + p2.id); } catch (err) {}
-    closeModal("linkModal"); openPersonCard(p1.id); toast("Связано в обе стороны!");
-  };
-  const baseOpenCard = openPersonCard;
-  openPersonCard = function(id) {
-    baseOpenCard(id); const p = persons.find(x => x.id === id), links = (p ? getMeta(p) : {}).links || [];
-    const block = document.getElementById("mLinksBlock"), list = document.getElementById("mLinksList"); list.innerHTML = "";
-    if (links.length > 0) {
-      block.classList.remove("hidden");
-      links.forEach((lk, idx) => {
-        const target = persons.find(x => x.id === lk.id); if (!target) return;
-        const row = document.createElement("div"); row.style.cssText = "display:flex; justify-content:space-between; align-items:center;";
-        row.innerHTML = '<div><span style="color:var(--muted);">' + roleNames[lk.role] + ':</span> <a href="#" style="color:var(--gold); font-weight:600; text-decoration:none; border-bottom:1px dashed var(--gold);" onclick="event.preventDefault(); openPersonCard(\'' + target.id + '\')">' + target.name + '</a></div><button class="btn btn-sm" style="padding:1px 6px; font-size:0.7rem;" onclick="removeLink(' + idx + ')">✕</button>';
-        list.appendChild(row);
-      });
-    } else block.classList.add("hidden");
-  };
-  function toggleTheme() {
-    const isLight = document.body.classList.toggle("light"); localStorage.setItem("chronicle_theme", isLight ? "light" : "dark");
-    document.getElementById("themeToggleBtn").textContent = isLight ? "🌙" : "☀️";
-    if (!document.getElementById("schemaTab").classList.contains("hidden")) renderSchema();
-  }
-  if (localStorage.getItem("chronicle_theme") === "light") { document.body.classList.add("light"); document.getElementById("themeToggleBtn").textContent = "🌙"; }
 
   renderAll();
   initCloud();
