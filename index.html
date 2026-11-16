@@ -1639,6 +1639,27 @@ if(!document.getElementById('newsBtn')){
     };
   }, 600);
 }
+{
+  const iv = setInterval(() => {
+    const kb = document.getElementById('kinBtn');
+    if(!kb) return; clearInterval(iv);
+    if(document.getElementById('tlBtn')) return;
+    if(!document.getElementById('tlMod')) document.body.insertAdjacentHTML('beforeend', `<div id="tlMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:480px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:80vh;overflow-y:auto;font:14px sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700">⏳ Лента времени рода</b><span onclick="tlMod.style.display='none'" style="cursor:pointer;font-size:20px">&times;</span></div><div id="tlBody"></div></div></div>`);
+    const b = document.createElement('button'); b.id = 'tlBtn'; b.textContent = '⏳ Лента';
+    b.style.cssText = 'padding:10px 14px;border-radius:10px;border:1px solid #d4af37;background:#1f242d;color:#ffd700;cursor:pointer;font-weight:600;font-size:14px';
+    b.onclick = () => {
+      const ev = [{y:1861,t:'📜 Отмена крепостного права',h:1},{y:1914,t:'⚔️ Первая мировая война',h:1},{y:1930,t:'🌾 Раскулачивание / коллективизация',h:1},{y:1941,t:'🎖️ Великая Отечественная война',h:1},{y:1991,t:'🏛️ Распад СССР',h:1}];
+      [...document.querySelectorAll('.card,[class*="card"]')].forEach(c => {
+        const m = c.innerText.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
+        const n = c.innerText.split('\n').map(s=>s.trim()).find(s=>s.length>4 && !/колено|дев\.|\d{4}/i.test(s));
+        if(m && n) ev.push({y:+m, t:`👶 ${n}`});
+      });
+      tlBody.innerHTML = ev.sort((a,b)=>a.y-b.y).map(e=>`<div style="margin:6px 0;padding:6px 10px;border-left:2px solid #d4af37;background:${e.h?'rgba(212,175,55,.15)':'#12141a'}"><b>${e.y}</b> — ${e.t}</div>`).join('');
+      tlMod.style.display = 'flex';
+    };
+    kb.after(b);
+  }, 500);
+}
 
 
 </script>
