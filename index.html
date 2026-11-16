@@ -1214,6 +1214,83 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       if (btn.dataset.tab === "schemaTab") setTimeout(renderSchema, 50);
     });
   });
+  const roleNames = { spouse: "💍 Супруг(а)", parent: "⬆️ Родитель", child: "⬇️ Ребёнок", sibling: "↔️ Брат / Сестра" };
+  const backRole = { spouse: "spouse", parent: "child", child: "parent", sibling: "sibling" };
+
+  function pushLink(personObj, role, targetId) {
+    personObj.stories = personObj.stories || [];
+    let meta = personObj.stories.find(s => s.type === "meta");
+    if (!meta) { meta = { type: "meta" }; personObj.stories.unshift(meta); }
+    meta.links = meta.links || [];
+    if (!meta.links.some(x => x.role === role && x.id === targetId)) meta.links.push({ role: role, id: targetId });
+  }
+
+  function filterLinkCandidates() {
+    const inp = document.getElementById("lkSearchInput");
+    const q = inp ? inp.value.trim().toLowerCase() : "";
+    const opts = persons
+      .filter(x => x.id !== activePersonId && (!q || x.name.toLowerCase().includes(q)))
+      .map(x => '<option value="' + x.id + '">' + x.name + '</option>')
+      .join("");
+    document.getElementById("lkTarget").innerHTML = opts;
+  }
+
+  document.getElementById("openAddLinkBtn").onclick = () => {
+    const inp = document.getElementById("lkSearchInput");
+    if (inp) { inp.value = ""; inp.oninput = filterLinkCandidates; }
+    filterLinkCandidates();
+    openModal("linkModal");
+    if (inp) setTimeout(() => inp.focus(), 60);
+  };
+        document.getElementById("linkForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const p1 = persons.find(x => x.id === activePersonId);
+    const role = document.getElementById("lkRole").value;
+    const p2 = persons.find(x => x.id === document.getElementById("lkTarget").value);
+    if (!p1 || !p2) return;
+    pushLink(p1, role, p2.id);
+    pushLink(p2, backRole[role], p1.id);
+    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+    try {
+      await sbFetch("persons", "PATCH", { stories: p1.stories }, "?id=eq." + p1.id);
+      await sbFetch("persons", "PATCH", { stories: p2.stories }, "?id=eq." + p2.id);
+    } catch (err) {}
+    closeModal("linkModal");
+    openPersonCard(p1.id);
+    toast("Связано в обе стороны!");
+  };
+
+  async function removeLink(idx) {
+    const p = persons.find(x => x.id === activePersonId);
+    const meta = p ? getMeta(p) : null;
+    if (!meta || !meta.links) return;
+    meta.links.splice(idx, 1);
+    localStorage.setItem("chronicle_persons", JSON.stringify(persons));
+    try { await sbFetch("persons", "PATCH", { stories: p.stories }, "?id=eq." + p.id); } catch (err) {}
+    openPersonCard(p.id);
+    toast("Связь удалена");
+  }
+
+  const baseOpenCard = openPersonCard;
+  openPersonCard = function(id) {
+    baseOpenCard(id);
+    const p = persons.find(x => x.id === id);
+    const links = (p ? getMeta(p) : {}).links || [];
+    const block = document.getElementById("mLinksBlock"), list = document.getElementById("mLinksList");
+    list.innerHTML = "";
+    if (links.length > 0) {
+      block.classList.remove("hidden");
+      links.forEach((lk, idx) => {
+        const target = persons.find(x => x.id === lk.id);
+        if (!target) return;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; align-items:center;";
+        row.innerHTML = '<div><span style="color:var(--muted);">' + roleNames[lk.role] + ':</span> <a href="#" style="color:var(--gold); font-weight:600; text-decoration:none; border-bottom:1px dashed var(--gold);" onclick="event.preventDefault(); openPersonCard(\'' + target.id + '\')">' + target.name + '</a></div><button class="btn btn-sm" style="padding:1px 6px; font-size:0.7rem;" onclick="removeLink(' + idx + ')">✕</button>';
+        list.appendChild(row);
+      });
+    } else block.classList.add("hidden");
+  };
+
 
   renderAll();
   initCloud();
