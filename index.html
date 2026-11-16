@@ -358,7 +358,8 @@
   </div>
 </div><div class="backdrop" id="linkModal">
   <div class="modal">
-    <div class="modal-head"><h3>Привязать родственника</h3><button class="close-btn" onclick="closeModal('linkModal')">&times;</button></div>
+        <div class="modal-head"><h3>Привязать родственника</h3><button class="close-btn" onclick="document.getElementById('linkModal').style.display='none'; closeModal('linkModal')">&times;</button></div>
+
     <form id="linkForm">
       <div class="field"><label class="label">Кем приходится?</label>
         <select id="lkRole">
@@ -976,13 +977,18 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       if (el) el.classList.add("selected");
     }
 
-    document.getElementById("openAddLinkBtn").onclick = () => {
+      document.getElementById("openAddLinkBtn").onclick = () => {
       document.getElementById("lkSearchInput").value = "";
       document.getElementById("lkTarget").value = "";
       filterLinkCandidates();
-      openModal("linkModal");
+      const lm = document.getElementById("linkModal");
+      lm.classList.remove("hidden");
+      lm.classList.add("open");
+      lm.style.display = "flex";
+      lm.style.zIndex = "99999";
       setTimeout(() => document.getElementById("lkSearchInput").focus(), 60);
     };
+
 
   document.getElementById("linkForm").onsubmit = async (e) => {
     e.preventDefault();
@@ -999,9 +1005,11 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
       await sbFetch("persons", "PATCH", { stories: p2.stories }, "?id=eq." + p2.id);
     } catch (err) {}
     closeModal("linkModal");
-    openPersonCard(p1.id);
-    toast("Связано в обе стороны!");
-  };
+           
+   document.getElementById("linkModal").style.display = "none";
+   openPersonCard(p1.id);
+   toast("Связано в обе стороны!");
+ };
 
   const baseOpenCard = openPersonCard;
   openPersonCard = function(id) {
