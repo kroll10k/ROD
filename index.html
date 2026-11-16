@@ -1200,6 +1200,199 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
 
   renderAll();
   initCloud();
+(function() {
+  let viewRootId = localStorage.getItem("chronicle_root_id") || "";
+  const cloudBtn = document.querySelector("button[onclick*='cloudModal']");
+  if (cloudBtn && !document.getElementById("themeToggleBtn")) {
+    const tBtn = document.createElement("button");
+    tBtn.className = "btn"; tBtn.id = "themeToggleBtn"; tBtn.type = "button";
+    tBtn.textContent = localStorage.getItem("chronicle_theme") === "light" ? "🌙" : "☀️";
+    tBtn.onclick = function() {
+      const isLight = document.body.classList.toggle("light");
+      localStorage.setItem("chronicle_theme", isLight ? "light" : "dark");
+      tBtn.textContent = isLight ? "🌙" : "☀️";
+      if (!document.getElementById("schemaTab").classList.contains("hidden")) renderSchema();
+    };
+    cloudBtn.parentNode.insertBefore(tBtn, cloudBtn.nextSibling);
+  }
+  const lightStyle = document.createElement("style");
+  lightStyle.textContent = "body.light { --bg: #f4f1ea; --bg-elevated: #ffffff; --card: #faf8f5; --border: #e5e0d8; --border-light: #d6cfc2; --text: #1c1917; --muted: #6b7280; --gold: #a67c00; --gold-dim: rgba(166, 124, 0, 0.12); } body.light header { background: linear-gradient(145deg, #ffffff, #efeae1); }";
+  document.head.appendChild(lightStyle);
+  if (localStorage.getItem("chronicle_theme") === "light") document.body.classList.add("light");
+
+  const svgBtn = document.getElementById("modeSvgBtn");
+  if (svgBtn && !document.getElementById("modeFanBtn")) {
+    const fanBtn = document.createElement("button");
+    fanBtn.className = "btn btn-sm"; fanBtn.id = "modeFanBtn"; fanBtn.type = "button"; fanBtn.textContent = "☀️ Веер";
+    fanBtn.onclick = function() { switchSchemaMode("fan"); };
+    svgBtn.parentNode.insertBefore(fanBtn, svgBtn.nextSibling);
+
+    const rootWrap = document.createElement("div");
+    rootWrap.style.cssText = "display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; width:100%;";
+    rootWrap.innerHTML = '<span style="font-size:0.8rem; color:var(--muted); font-weight:600;">👁️ Точка отсчёта:</span><select id="rootPersonSelect" style="max-width:290px; padding:6px 10px; font-size:0.85rem;"></select>';
+    svgBtn.parentNode.parentNode.appendChild(rootWrap);
+
+    document.getElementById("rootPersonSelect").onchange = function(e) {
+      viewRootId = e.target.value; localStorage.setItem("chronicle_root_id", viewRootId); renderSchema();
+    };
+  }
+  function refreshRootSelect() {
+    const sel = document.getElementById("rootPersonSelect");
+    if (!sel || !Array.isArray(persons)) return;
+    if (!viewRootId || !persons.some(p => p.id === viewRootId)) {
+      const sorted = [...persons].sort((a, b) => a.gen - b.gen);
+      viewRootId = sorted[0] ? sorted[0].id : "";
+    }
+    sel.innerHTML = persons.map(p => '<option value="' + p.id + '"' + (p.id === viewRootId ? ' selected' : '') + '>' + p.name + ' (' + p.gen + '-е кол.)</option>').join("");
+  }
+
+  function getRelativeLevels() {
+    const rel = {};
+    if (!viewRootId || !persons.some(p => p.id === viewRootId)) { persons.forEach(p => { rel[p.id] = p.gen; }); return rel; }
+    rel[viewRootId] = 0;
+    const queue = [viewRootId];
+    while (queue.length > 0) {
+      const curId = queue.shift(), curLvl = rel[curId], curP = persons.find(x => x.id === curId);
+      if (!curP) continue;
+      (getMeta(curP).links || []).forEach(lk => {
+        if (rel[lk.id] !== undefined) return;
+        if (lk.role === "spouse" || lk.role === "sibling") rel[lk.id] = curLvl;
+        else if (lk.role === "parent") rel[lk.id] = curLvl + 1;
+        else if (lk.role === "child") rel[lk.id] = curLvl - 1;
+        queue.push(lk.id);
+      });
+    }
+    const rootObj = persons.find(x => x.id === viewRootId), rootGen = rootObj ? rootObj.gen : 1;
+    persons.forEach(p => { if (rel[p.id] === undefined) rel[p.id] = p.gen - rootGen; });
+    return rel;
+  }
+  window.buildTreeSvg = function(svgId) {
+    refreshRootSelect();
+    const isLight = document.body.classList.contains("light");
+    const bgCol = isLight ? "#f4f1ea" : "#0d1015", cardBg = isLight ? "#ffffff" : "#161b24";
+    const nameCol = isLight ? "#1c1917" : "#f3f4f6", subCol = isLight ? "#6b7280" : "#9ca3af", lineCol = isLight ? "#b48a3e" : "#d4af37";
+    const rel = getRelativeLevels();
+    const lvls = [...new Set(persons.map(p => rel[p.id]))].sort((a, b) => a - b);
+    const nodeW = 215, nodeH = 96, gapX = 28, gapY = 115, coords = {}, rows = [];
+    let maxRowWidth = 820;
+
+    lvls.forEach(lvl => {
+      const raw = persons.filter(p => rel[p.id] === lvl), ordered = [], visited = new Set();
+      raw.forEach(p => {
+        if (visited.has(p.id)) return;
+        visited.add(p.id); ordered.push(p);
+        const spLink = (getMeta(p).links || []).find(l => l.role === "spouse");
+        if (spLink) { const sp = raw.find(x => x.id === spLink.id); if (sp && !visited.has(sp.id)) { visited.add(sp.id); ordered.push(sp); } }
+      });
+      rows.push({ lvl: lvl, list: ordered });
+      const w = ordered.length * (nodeW + gapX) + 140;
+      if (w > maxRowWidth) maxRowWidth = w;
+    });
+            const width = maxRowWidth, height = rows.length * (nodeH + gapY) + 110;
+    const branchIcons = { direct: "👑", wife: "💚", side: "🌿", union: "💍" };
+    let nodesSvg = "";
+    rows.forEach((row, rIdx) => {
+      const rowW = row.list.length * (nodeW + gapX) - gapX, startX = (width - rowW) / 2, y = 45 + rIdx * (nodeH + gapY);
+      const lbl = row.lvl === 0 ? "ТОЧКА ОТСЧЁТА" : (row.lvl > 0 ? "+" + row.lvl + " ПОКОЛЕНИЕ ВГЛУБЬ" : row.lvl + " ПОКОЛЕНИЕ (ПОТОМКИ)");
+      nodesSvg += '<text x="24" y="' + (y - 12) + '" fill="' + subCol + '" font-size="11" font-weight="bold" font-family="sans-serif">' + lbl + '</text>';
+      row.list.forEach((p, cIdx) => {
+        const x = startX + cIdx * (nodeW + gapX), px = x + nodeW / 2, py = y + 26;
+        coords[p.id] = { x: px, y: py, top: y, bottom: y + nodeH };
+        const isFocus = p.id === viewRootId;
+        const stroke = isFocus ? "#f59e0b" : (p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : lineCol)));
+        const meta = getMeta(p), clipId = "clip_" + p.id.replace(/[^a-zA-Z0-9]/g, ""), icon = branchIcons[p.branch] || "🌳";
+        const parts = p.name.trim().split(" ");
+        const line1 = parts.length > 2 ? parts.slice(0, 2).join(" ") : p.name;
+        const line2 = parts.length > 2 ? parts.slice(2).join(" ") : (p.years || p.gen + "-е колено");
+        const boxW = Math.max(185, Math.min(235, Math.max(line1.length, line2.length) * 7.2 + 22)), boxX = px - boxW / 2;
+        nodesSvg += '<g style="cursor:pointer" onclick="openPersonCard(\'' + p.id + '\')">';
+        if (meta.avatar) {
+          nodesSvg += '<clipPath id="' + clipId + '"><circle cx="' + px + '" cy="' + py + '" r="23"/></clipPath><circle cx="' + px + '" cy="' + py + '" r="25" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="' + (isFocus ? '3.5' : '2.5') + '"/><image href="' + meta.avatar + '" x="' + (px - 23) + '" y="' + (py - 23) + '" width="46" height="46" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + clipId + ')"/>';
+        } else {
+          nodesSvg += '<circle cx="' + px + '" cy="' + py + '" r="24" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="' + (isFocus ? '3.5' : '2.2') + '"/><text x="' + px + '" y="' + (py + 7) + '" text-anchor="middle" font-size="19">' + icon + '</text>';
+        }
+        nodesSvg += '<rect x="' + boxX + '" y="' + (y + 52) + '" width="' + boxW + '" height="42" rx="8" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="' + (isFocus ? '2.4' : '1.4') + '"/><text x="' + px + '" y="' + (y + 68) + '" text-anchor="middle" fill="' + nameCol + '" font-size="11" font-weight="bold" font-family="sans-serif">' + line1 + '</text><text x="' + px + '" y="' + (y + 84) + '" text-anchor="middle" fill="' + subCol + '" font-size="9.5" font-family="sans-serif">' + line2 + '</text></g>';
+      });
+    });
+
+    let lines = "";
+    const drawn = new Set(), coupleMid = {};
+    persons.forEach(p => {
+      const c1 = coords[p.id]; if (!c1) return;
+      (getMeta(p).links || []).forEach(lk => {
+        if (lk.role !== "spouse") return;
+        const c2 = coords[lk.id]; if (!c2) return;
+        const key = [p.id, lk.id].sort().join("__"), mx = (c1.x + c2.x) / 2, my = (c1.y + c2.y) / 2;
+        coupleMid[p.id] = { x: mx, y: my };
+        if (drawn.has(key)) return; drawn.add(key);
+        lines += '<line x1="' + c1.x + '" y1="' + c1.y + '" x2="' + c2.x + '" y2="' + c2.y + '" stroke="#10b981" stroke-width="2.5" stroke-dasharray="5,4"/><circle cx="' + mx + '" cy="' + my + '" r="4.5" fill="#10b981"/>';
+      });
+    });
+    persons.forEach(p => {
+      const c1 = coords[p.id]; if (!c1) return;
+      (getMeta(p).links || []).forEach(lk => {
+        if (lk.role !== "child" && lk.role !== "parent") return;
+        const c2 = coords[lk.id]; if (!c2) return;
+        const parId = lk.role === "child" ? p.id : lk.id, chdId = lk.role === "child" ? lk.id : p.id;
+        const parC = coords[parId], chdC = coords[chdId], startPt = coupleMid[parId] || { x: parC.x, y: parC.top }, endY = chdC.bottom;
+        const key = coupleMid[parId] ? [parId, "couple", chdId].join("__") : [parId, chdId].join("__");
+        if (drawn.has(key)) return; drawn.add(key);
+        const elbowY = (startPt.y + endY) / 2;
+        lines += '<path d="M ' + startPt.x + ' ' + startPt.y + ' L ' + startPt.x + ' ' + elbowY + ' L ' + chdC.x + ' ' + elbowY + ' L ' + chdC.x + ' ' + endY + '" fill="none" stroke="' + lineCol + '" stroke-width="1.8" stroke-opacity="0.75"/>';
+      });
+    });
+    return '<svg id="' + svgId + '" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:' + bgCol + '; display:block;">' + lines + nodesSvg + '</svg>';
+  };
+        function buildFanSvg(svgId) {
+    refreshRootSelect();
+    const isLight = document.body.classList.contains("light");
+    const bgCol = isLight ? "#f4f1ea" : "#0d1015", cardBg = isLight ? "#ffffff" : "#161b24";
+    const nameCol = isLight ? "#1c1917" : "#f3f4f6", subCol = isLight ? "#6b7280" : "#9ca3af", lineCol = isLight ? "#b48a3e" : "#d4af37";
+    const rel = getRelativeLevels();
+    const lvls = [...new Set(persons.map(p => rel[p.id]).filter(x => x >= 0))].sort((a, b) => a - b);
+    const ringW = 112, cx = 580, cy = Math.max(460, lvls.length * ringW + 60), width = 1160, height = cy + 90;
+    const startDeg = -195, endDeg = 15, spanDeg = endDeg - startDeg;
+    const toRad = d => (d * Math.PI) / 180;
+    let svg = "";
+
+    lvls.forEach((lvl, rIdx) => {
+      const raw = persons.filter(p => rel[p.id] === lvl), ordered = [], visited = new Set();
+      raw.forEach(p => {
+        if (visited.has(p.id)) return;
+        visited.add(p.id); ordered.push(p);
+        const spLink = (getMeta(p).links || []).find(l => l.role === "spouse");
+        if (spLink) { const sp = raw.find(x => x.id === spLink.id); if (sp && !visited.has(sp.id)) { visited.add(sp.id); ordered.push(sp); } }
+      });
+      const rIn = rIdx === 0 ? 15 : 65 + (rIdx - 1) * ringW, rOut = 65 + rIdx * ringW, step = spanDeg / Math.max(1, ordered.length);
+      ordered.forEach((p, idx) => {
+        const a1 = startDeg + idx * step, a2 = a1 + step, aMid = (a1 + a2) / 2;
+        const stroke = p.id === viewRootId ? "#f59e0b" : (p.branch === "wife" ? "#10b981" : (p.branch === "side" ? "#8b5cf6" : (p.branch === "union" ? "#38bdf8" : lineCol)));
+        const x1 = cx + rIn * Math.cos(toRad(a1)), y1 = cy + rIn * Math.sin(toRad(a1)), x2 = cx + rOut * Math.cos(toRad(a1)), y2 = cy + rOut * Math.sin(toRad(a1));
+        const x3 = cx + rOut * Math.cos(toRad(a2)), y3 = cy + rOut * Math.sin(toRad(a2)), x4 = cx + rIn * Math.cos(toRad(a2)), y4 = cy + rIn * Math.sin(toRad(a2));
+        const large = step > 180 ? 1 : 0;
+        const d = "M " + x1 + " " + y1 + " L " + x2 + " " + y2 + " A " + rOut + " " + rOut + " 0 " + large + " 1 " + x3 + " " + y3 + " L " + x4 + " " + y4 + " A " + rIn + " " + rIn + " 0 " + large + " 0 " + x1 + " " + y1 + " Z";
+        const rMid = (rIn + rOut) / 2, tx = cx + rMid * Math.cos(toRad(aMid)), ty = cy + rMid * Math.sin(toRad(aMid));
+        const parts = p.name.trim().split(" "), shortName = parts.length > 1 ? parts[0] + " " + parts[1][0] + "." : p.name;
+        svg += '<g style="cursor:pointer" onclick="openPersonCard(\'' + p.id + '\')"><path d="' + d + '" fill="' + cardBg + '" stroke="' + stroke + '" stroke-width="1.8"/><text x="' + tx + '" y="' + (ty - 3) + '" text-anchor="middle" fill="' + nameCol + '" font-size="10.5" font-weight="bold" font-family="sans-serif">' + shortName + '</text><text x="' + tx + '" y="' + (ty + 11) + '" text-anchor="middle" fill="' + subCol + '" font-size="8.5" font-family="sans-serif">' + (p.years || p.gen + "-е кол.") + '</text></g>';
+      });
+    });
+    return '<svg id="' + svgId + '" xmlns="http://w3.org" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" style="background:' + bgCol + '; display:block;">' + svg + '</svg>';
+  }
+
+  window.renderSchema = function() {
+    const fBtn = document.getElementById("modeFanBtn");
+    if (fBtn) fBtn.classList.toggle("btn-primary", schemaMode === "fan");
+    if (schemaMode === "fan") {
+      document.getElementById("graphCanvasWrap").classList.add("hidden");
+      document.getElementById("svgSchemaWrap").classList.remove("hidden");
+      document.getElementById("svgSchemaWrap").innerHTML = buildFanSvg("familySvgEl");
+    } else if (schemaMode === "graph") renderVisGraph();
+    else renderSvgBlueprint();
+  };
+})();
+
+
+
 </script>
 </body>
 </html>
