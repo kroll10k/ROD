@@ -1696,6 +1696,53 @@ if(!document.getElementById('newsBtn')){
     );
   };
 }
+{
+  const normTokens = (str, maiden = "") => {
+    const clean = s => (s || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(Boolean);
+    const base = clean(str);
+    const mArr = clean(maiden);
+    return { base, alt: mArr.length && base.length >= 2 ? [...base.slice(1), ...mArr] : base };
+  };
+
+  const samePerson = (cardName, maiden, tagName) => {
+    const tWords = new Set((tagName || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(Boolean));
+    if (tWords.size < 2) return false;
+    const { base, alt } = normTokens(cardName, maiden);
+    const matchSet = arr => arr.length >= 2 && arr.every(w => tWords.has(w)) && tWords.size === arr.length;
+    return matchSet(base) || matchSet(alt);
+  };
+
+  const _origOpen = openPersonCard;
+  openPersonCard = function(id) {
+    _origOpen(id);
+    const p = persons.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById("k-p-gal")?.remove();
+    const meta = getMeta(p);
+
+    const kPics = (mediaList || []).filter(m => Array.isArray(m.tags) && m.tags.some(t => {
+      if (!t) return false;
+      if (String(t.personId) === String(id) || String(t.id) === String(id)) return true;
+      return samePerson(p.name, meta.maiden, t.name || t.personName || "");
+    }));
+
+    const famBlock = [...document.querySelectorAll("#personModal div, #personModal h4, #personModal label")]
+      .find(el => el.textContent.trim() === "СЕМЬЯ И РОДСТВЕННЫЕ СВЯЗИ")?.parentElement;
+    if (!famBlock) return;
+
+    const html = kPics.length
+      ? `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${kPics.map(m =>
+          `<img src="${m.file_url || m.url || m.src}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`
+        ).join("")}</div>`
+      : `<div style="font-size:12px;color:#777">На фото пока не отмечен(а)</div>`;
+
+    famBlock.insertAdjacentHTML("afterend",
+      `<div id="k-p-gal" style="margin:12px 0;padding:10px;background:#16181d;border-radius:10px;border:1px solid #2a2d35">` +
+      `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div>` +
+      `${html}</div>`
+    );
+  };
+}
 
 </script>
 </body>
