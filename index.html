@@ -1746,7 +1746,8 @@ if(!document.getElementById('newsBtn')){
     </script>
       <script>
 setInterval(() => {
-  const lbl = [...document.querySelectorAll("div,h3,h4,h5,label,span")].find(el => el.offsetParent && el.textContent.trim().length < 45 && el.textContent.includes("СЕМЬЯ И РОДСТВЕННЫЕ СВЯЗИ"));
+  const lbl = [...document.querySelectorAll("div,h3,h4,h5,label,span")].find(el => el.offsetParent && el.textContent.trim().length < 45 && el.textContent.trim().toLowerCase().includes("семья и родственные связи"));
+ 
 
   if (!lbl) return;
   const box = lbl.parentElement;
