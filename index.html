@@ -1748,6 +1748,25 @@ if(!document.getElementById('newsBtn')){
     });
   }, 400);
 }
+<script>
+setInterval(() => {
+  document.querySelectorAll('select').forEach(sel => {
+    if (sel.dataset.f || sel.options.length < 6) return;
+    sel.dataset.f = '1';
+    const opts = [...sel.options].map(o => ({ v: o.value, t: o.text }));
+    const inp = document.createElement('input');
+    inp.placeholder = '🔍 Поиск по имени (2-3 буквы)...';
+    inp.style.cssText = 'width:100%;padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid #d4af37;background:#141414;color:#fff;font-size:14px;box-sizing:border-box';
+    inp.oninput = () => {
+      const q = inp.value.toLowerCase().trim();
+      sel.innerHTML = '';
+      opts.filter(o => o.t.toLowerCase().includes(q)).forEach(o => sel.add(new Option(o.t, o.v)));
+      if (sel.options.length) sel.selectedIndex = 0;
+    };
+    sel.before(inp);
+  });
+}, 400);
+</script>
 
 
 
