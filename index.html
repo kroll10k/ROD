@@ -2172,6 +2172,36 @@ setInterval(() => {
   });
 }, 400);
 </script>
+<style>
+  #k-news-btn, #k-news-dot { display: none !important; }
+</style>
+<script>
+(() => {
+  const block = fn => function(el, ...rest) {
+    if (el && (el.id === "k-news-btn" || String(el.textContent || "").includes("✨ Что нового"))) return el;
+    return fn.call(this, el, ...rest);
+  };
+  Element.prototype.appendChild = block(Element.prototype.appendChild);
+  Element.prototype.insertBefore = block(Element.prototype.insertBefore);
+
+  setInterval(() => {
+    document.getElementById("k-news-btn")?.remove();
+
+    document.querySelectorAll("button, a").forEach(b => {
+      if (b.id !== "k-news-btn" && (b.textContent.includes("Что нового и как") || b.textContent.trim() === "📜")) {
+        if (b.textContent.trim() !== "📜 Что нового") b.textContent = "📜 Что нового";
+      }
+    });
+
+    const hdr = [...document.querySelectorAll("div,h2,h3,span")].find(e =>
+      e.offsetParent && e.textContent.trim().startsWith("📜 Что нового") && e.textContent.trim().length < 35
+    );
+    if (hdr && hdr.textContent.trim() !== "📜 Что нового") {
+      hdr.textContent = "📜 Что нового";
+    }
+  }, 300);
+})();
+</script>
 
 </body>
 </html>
