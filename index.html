@@ -1970,6 +1970,86 @@ document.addEventListener("click", e => {
   }
 }, true);
 </script>
+<script>
+setInterval(() => {
+  const inp = document.querySelector("#photoModal input[type='text'], #taggerModal input[type='text'], input[placeholder*='Подпись'], input[value*='.jpg']");
+  if (!inp || typeof activePhoto === "undefined" || !activePhoto) return;
+  const host = inp.closest("div")?.parentElement || inp.parentElement;
+  if (!host) return;
+
+  const tags = Array.isArray(activePhoto.tags) ? activePhoto.tags : [];
+  const sig = activePhoto.id + ":" + tags.map(t => t.name || t.personName || "").join("|");
+  let bar = document.getElementById("k-tags-del-bar");
+  if (bar && bar.dataset.sig === sig) return;
+
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "k-tags-del-bar";
+    bar.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px";
+    host.insertBefore(bar, host.firstChild);
+  }
+  bar.dataset.sig = sig;
+  bar.innerHTML = tags.map((t, i) => {
+    const nm = String(t.name || t.personName || "Метка").trim();
+    return `<span style="display:inline-flex;align-items:center;gap:6px;background:#1c1f26;border:1px solid #d4af37;color:#fff;padding:4px 10px;border-radius:999px;font-size:12px">` +
+      `<span>${nm}</span>` +
+      `<button type="button" data-k-del-idx="${i}" style="background:#8b1e1e;color:#fff;border:none;border-radius:50%;width:18px;height:18px;line-height:16px;text-align:center;cursor:pointer;font-weight:700;padding:0">×</button>` +
+    `</span>`;
+  }).join("");
+}, 300);
+
+document.addEventListener("click", async e => {
+  const btn = e.target.closest("[data-k-del-idx]");
+  if (!btn || typeof activePhoto === "undefined" || !activePhoto) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const idx = Number(btn.dataset.kDelIdx);
+  activePhoto.tags = (activePhoto.tags || []).filter((_, i) => i !== idx);
+  localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
+  if (typeof renderPhotoPins === "function") renderPhotoPins();
+  try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch (err) {}
+}, true);
+</script>
+<script>
+setInterval(() => {
+  const inp = document.querySelector("#photoModal input[type='text'], #taggerModal input[type='text'], input[placeholder*='Подпись'], input[value*='.jpg']");
+  if (!inp || typeof activePhoto === "undefined" || !activePhoto) return;
+  const host = inp.closest("div")?.parentElement || inp.parentElement;
+  if (!host) return;
+
+  const tags = Array.isArray(activePhoto.tags) ? activePhoto.tags : [];
+  const sig = activePhoto.id + ":" + tags.map(t => t.name || t.personName || "").join("|");
+  let bar = document.getElementById("k-tags-del-bar");
+  if (bar && bar.dataset.sig === sig) return;
+
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "k-tags-del-bar";
+    bar.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px";
+    host.insertBefore(bar, host.firstChild);
+  }
+  bar.dataset.sig = sig;
+  bar.innerHTML = tags.map((t, i) => {
+    const nm = String(t.name || t.personName || "Метка").trim();
+    return `<span style="display:inline-flex;align-items:center;gap:6px;background:#1c1f26;border:1px solid #d4af37;color:#fff;padding:4px 10px;border-radius:999px;font-size:12px">` +
+      `<span>${nm}</span>` +
+      `<button type="button" data-k-del-idx="${i}" style="background:#8b1e1e;color:#fff;border:none;border-radius:50%;width:18px;height:18px;line-height:16px;text-align:center;cursor:pointer;font-weight:700;padding:0">×</button>` +
+    `</span>`;
+  }).join("");
+}, 300);
+
+document.addEventListener("click", async e => {
+  const btn = e.target.closest("[data-k-del-idx]");
+  if (!btn || typeof activePhoto === "undefined" || !activePhoto) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const idx = Number(btn.dataset.kDelIdx);
+  activePhoto.tags = (activePhoto.tags || []).filter((_, i) => i !== idx);
+  localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
+  if (typeof renderPhotoPins === "function") renderPhotoPins();
+  try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch (err) {}
+}, true);
+</script>
 
 </body>
 </html>
