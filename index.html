@@ -2231,6 +2231,37 @@ setInterval(() => {
   `);
 }, 250);
 </script>
+<script>
+setInterval(() => {
+  const el = [...document.querySelectorAll("*")].find(e => e.offsetParent && e.children.length === 0 && e.textContent.includes("Что нового") && e.textContent.trim().length < 30);
+  if (!el || el.dataset.kBoxReady) return;
+  el.dataset.kBoxReady = "1";
+  el.insertAdjacentHTML("afterend", `
+    <div style="margin-top:12px;font-size:14px;line-height:1.5;color:#e5e7eb;text-align:left;max-height:65vh;overflow-y:auto;padding-right:4px">
+      <div style="background:#1c1f26;border:1px solid #d4af37;border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="color:#d4af37;font-weight:700;font-size:15px;margin-bottom:6px">✨ Что нового (27.11.2026)</div>
+        <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px">
+          <li><b>Фотографии в анкете каждого родственника:</b> под блоком «Семья и родственные связи» теперь автоматически появляются все фото и документы с его участием (включая девичьи фамилии).</li>
+          <li><b>Аккуратные точки на лицах:</b> большие таблички с именами заменены на маленькие золотые кружочки — лица на снимках больше не перекрываются.</li>
+          <li><b>Удаление меток в один клик:</b> под каждым снимком появились плашки отмеченных людей с красным крестиком <b>×</b>.</li>
+          <li><b>Умный поиск по базе:</b> искать родственников в списках теперь можно по любым буквам и в любом порядке слов (хоть «Полина Кузьмич», хоть «Кузьмич Полина»).</li>
+          <li><b>Ветка Елены:</b> добавлены и обновлены сведения по родственникам со стороны Лены.</li>
+        </ul>
+      </div>
+      <div style="background:#16181d;border:1px solid #2a2d35;border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="color:#d4af37;font-weight:700;font-size:15px;margin-bottom:6px">📖 Как этим пользоваться</div>
+        <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px">
+          <li><b>Посмотреть фото человека:</b> откройте любую карточку в древе — под списком семьи появится полоска <b>«📸 Фотографии»</b>. Нажмите на миниатюру, чтобы открыть снимок крупно.</li>
+          <li><b>Узнать, кто на фото:</b> наведите стрелку мышки на золотой кружочек на лице (или нажмите на него пальцем на телефоне) — всплывёт имя.</li>
+          <li><b>Отметить человека на снимке:</b> откройте фото во вкладке «Фото и сканы», нажмите прямо на лицо, выберите имя из списка (можно ввести пару букв в поиск) и нажмите <b>«ОК»</b>.</li>
+          <li><b>Убрать ошибочную отметку:</b> под открытым снимком нажмите на красный крестик <b>×</b> рядом с именем.</li>
+        </ul>
+      </div>
+      <button type="button" onclick="this.closest('[style*=\'fixed\']')?.remove();document.querySelectorAll('.close-btn,[onclick*=close]').forEach(b=>b.click())" style="width:100%;padding:10px;background:#d4af37;color:#111;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Понятно, закрыть</button>
+    </div>
+  `);
+}, 250);
+</script>
 
 </body>
 </html>
