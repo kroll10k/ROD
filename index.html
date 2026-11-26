@@ -2050,6 +2050,70 @@ document.addEventListener("click", async e => {
   try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch (err) {}
 }, true);
 </script>
+<script>
+(() => {
+  const APP_VER = "2.7.27";
+  const NEWS_HTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:13.5px;line-height:1.45;color:#e5e7eb">
+      <div style="background:#1c1f26;border:1px solid #d4af37;border-radius:10px;padding:12px">
+        <div style="color:#d4af37;font-weight:700;font-size:14px;margin-bottom:6px">🔥 Обновление от 27.11.2026</div>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+          <li><b>Фотогалерея в карточке каждого предка:</b> под блоком «Семья и родственные связи» теперь автоматически подтягиваются все фото и сканы, на которых отмечен человек (с учётом девичьих фамилий и любого порядка слов).</li>
+          <li><b>Точки на лицах вместо громоздких табличек:</b> метки на фотографиях свернулись в компактные полупрозрачные точки и не закрывают лица — имя разворачивается при наведении или нажатии.</li>
+          <li><b>Удобное управление отметками:</b> под каждым снимком появились плашки отмеченных людей с кнопкой быстрого удаления <b>×</b>, а при клике на метку на фото можно сразу заменить человека через поиск.</li>
+          <li><b>Умный поиск в списках:</b> поиск по родственникам теперь находит человека по любым 2–3 буквам и в любом порядке слов (хоть «Полина Кузьмич», хоть «Кузьмич Полина»).</li>
+          <li><b>Исправлена мобильная вёрстка:</b> убран лишний второй скролл и выезжание окон за края экрана на телефоне.</li>
+        </ul>
+      </div>
+      <div style="background:#16181d;border:1px solid #2a2d35;border-radius:10px;padding:12px;opacity:.85">
+        <div style="color:#9ca3af;font-weight:700;font-size:13px;margin-bottom:4px">📌 Ранее в «Летописи родов»</div>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:#9ca3af;font-size:12.5px">
+          <li>Авторизация для родни («Кто вносит правки») и фиксация автора последнего изменения в карточке.</li>
+          <li>Предложения правок от родственников с модерацией администратора.</li>
+          <li>Кнопка «Кто кому приходится» для расчёта степени родства между двумя людьми.</li>
+        </ul>
+      </div>
+    </div>`;
+
+  const mountBtn = () => {
+    if (document.getElementById("k-news-btn")) return;
+    const target = [...document.querySelectorAll("button, a")]
+      .find(b => b.offsetParent && (b.textContent.includes("Облако") || b.textContent.includes("Родне") || b.textContent.includes("Предок")));
+    if (!target || !target.parentElement) return;
+
+    const isNew = localStorage.getItem("k_seen_ver") !== APP_VER;
+    const btn = document.createElement("button");
+    btn.id = "k-news-btn";
+    btn.type = "button";
+    btn.style.cssText = "display:inline-flex;align-items:center;gap:6px;background:#1c1f26;color:#d4af37;border:1px solid #d4af37;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;position:relative";
+    btn.innerHTML = `✨ Что нового` + (isNew ? `<span id="k-news-dot" style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block"></span>` : ``);
+
+    btn.onclick = () => {
+      localStorage.setItem("k_seen_ver", APP_VER);
+      document.getElementById("k-news-dot")?.remove();
+      document.getElementById("k-news-modal")?.remove();
+
+      const ov = document.createElement("div");
+      ov.id = "k-news-modal";
+      ov.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px";
+      ov.innerHTML = `
+        <div style="background:#121419;border:1px solid #d4af37;border-radius:14px;padding:16px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.8)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid #2a2d35;padding-bottom:10px">
+            <div style="font-size:16px;font-weight:700;color:#fff">✨ Что нового в «Летописи родов»</div>
+            <button type="button" id="k-news-x" style="background:#2a2d35;color:#fff;border:none;border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer">×</button>
+          </div>
+          ${NEWS_HTML}
+        </div>`;
+      ov.onclick = e => { if (e.target === ov || e.target.id === "k-news-x") ov.remove(); };
+      document.body.appendChild(ov);
+    };
+
+    target.parentElement.appendChild(btn);
+  };
+
+  setInterval(mountBtn, 500);
+})();
+</script>
 
 </body>
 </html>
