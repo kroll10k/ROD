@@ -2114,6 +2114,52 @@ document.addEventListener("click", async e => {
   setInterval(mountBtn, 500);
 })();
 </script>
+<script>
+setInterval(() => {
+  document.getElementById("k-news-btn")?.remove();
+
+  const hdr = [...document.querySelectorAll("div,h2,h3,span")].find(e =>
+    e.offsetParent && (e.textContent.trim() === "📜 Что нового и как юзать" || e.textContent.trim() === "📜 Что нового и как пользоваться")
+  );
+  if (!hdr) return;
+
+  if (hdr.textContent.trim() === "📜 Что нового и как юзать") {
+    hdr.textContent = "📜 Что нового и как пользоваться";
+  }
+
+  const box = hdr.parentElement?.parentElement || hdr.parentElement;
+  if (!box || box.dataset.kGuideDone) return;
+  box.dataset.kGuideDone = "1";
+
+  box.insertAdjacentHTML("beforeend", `
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.5;color:#e5e7eb;max-height:70vh;overflow-y:auto;padding-right:4px">
+      
+      <div style="background:#1c1f26;border:1px solid #d4af37;border-radius:10px;padding:12px">
+        <div style="color:#d4af37;font-weight:700;font-size:15px;margin-bottom:8px">✨ Что нового появилось (27.11.2026)</div>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">
+          <li><b>Общие семейные фотографии в анкете человека:</b> теперь, когда вы открываете карточку любого родственника, прямо под списком его семьи автоматически появляются все фотографии и документы, на которых он отмечен.</li>
+          <li><b>Аккуратные точки на лицах вместо больших табличек:</b> надписи с именами больше не закрывают лица на старых снимках — теперь там стоят маленькие золотые кружочки.</li>
+          <li><b>Удобное удаление отметок:</b> под каждой фотографией теперь видны имена всех отмеченных людей с красным крестиком <b>×</b> — ошибочную отметку можно убрать одним нажатием.</li>
+          <li><b>Быстрый поиск родственников:</b> искать человека в списках теперь можно по любым буквам и в любом порядке слов (например, можно написать и «Полина Кузьмич», и «Кузьмич Полина» — программа всё равно найдёт). Учитываются и девичьи фамилии.</li>
+          <li><b>Пополнена ветка Елены:</b> добавлены и обновлены сведения по родственникам со стороны Лены.</li>
+        </ul>
+      </div>
+
+      <div style="background:#16181d;border:1px solid #2a2d35;border-radius:10px;padding:12px">
+        <div style="color:#d4af37;font-weight:700;font-size:15px;margin-bottom:8px">📖 Как этим пользоваться</div>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">
+          <li><b>Как посмотреть фото человека:</b> нажмите на любую карточку в древе рода — под списком родителей, детей и супругов появится полоска <b>«📸 Фотографии»</b>. Нажмите на маленькое фото, чтобы открыть его крупно.</li>
+          <li><b>Как узнать, кто на фотографии:</b> наведите стрелку мышки на золотой кружочек на лице (или нажмите на кружочек пальцем на телефоне) — появится имя человека.</li>
+          <li><b>Как отметить человека на фото:</b> откройте снимок во вкладке «Фото и сканы», нажмите прямо на лицо человека, выберите его имя из списка (можно начать вводить фамилию или имя в строку поиска) и нажмите <b>«ОК»</b>.</li>
+          <li><b>Как убрать неверную отметку:</b> под открытой фотографией найдите табличку с именем и нажмите на красный крестик <b>×</b> рядом с ним.</li>
+          <li><b>Как добавить или поправить сведения о родственнике:</b> откройте его анкету и нажмите <b>«✏️ Анкета»</b> (чтобы изменить имя, даты, место или девичью фамилию) либо <b>«+ Веха жизни»</b> (чтобы записать важную историю, работу или событие).</li>
+        </ul>
+      </div>
+
+    </div>
+  `);
+}, 300);
+</script>
 
 </body>
 </html>
