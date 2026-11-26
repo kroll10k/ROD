@@ -531,6 +531,10 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     document.getElementById("mName").textContent = p.name;
     document.getElementById("mMaiden").textContent = meta.maiden ? ("Девичья фамилия: " + meta.maiden) : "";
     document.getElementById("mYears").textContent = p.gen + "-е колено • " + (p.years || "");
+     document.getElementById("k-p-gal")?.remove();
+const kPics = mediaList.filter(m => Array.isArray(m.tags) && m.tags.some(t => t && (String(t.personId) === String(id) || String(t.personName || "").trim() === p.name.trim())));
+if (kPics.length) document.getElementById("mBio").parentElement.insertAdjacentHTML("beforebegin", `<div id="k-p-gal" style="margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333"><div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${kPics.map(m => `<img src="${m.file_url}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`).join("")}</div></div>`);
+   
     document.getElementById("mBio").textContent = p.bio || "Нет описания";
     document.getElementById("mLoc").textContent = "📍 " + (p.location || "Не указано");
 
@@ -1665,142 +1669,6 @@ if(!document.getElementById('newsBtn')){
   document.body.insertAdjacentHTML('beforeend', `<div id="nMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:480px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:82vh;overflow-y:auto;font:14px/1.45 sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700;font-size:16px">📜 Что нового и как юзать</b><span onclick="nMod.style.display='none'" style="cursor:pointer;font-size:22px">&times;</span></div><div id="nTxt"></div></div></div>`);
   setInterval(() => { const b=document.getElementById('newsBtn'); if(b) b.onclick=()=>nMod.style.display='flex'; }, 500);
 }
-{
-  const el = document.getElementById('nTxt');
-  if(el) el.innerHTML = `<p><b>1. 3D-карточки и живой поиск</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + золотая подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — человек загорится на схеме.</p><p><b>2. Древо от себя, «Веер» и «🎯 На схеме»</b><br>❌ Было: схема только сверху от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Расширенная анкета и кладбище</b><br>❌ Было: одно поле города.<br>✅ Стало: 3 поля географии, девичья фамилия, гражданство, контакты и GPS могилы.<br>👉 Юзать: открой карточку → «✏️ Анкета».</p><p><b>4. «🧬 Кто кому», «⏳ Лента» и права</b><br>✅ Стало: калькулятор родства, хронология по годам и защита от случайного удаления.</p>`;
-}
-{
-  const st = document.createElement('style');
-  st.textContent = `html,body{max-width:100vw!important;overflow-x:hidden!important}*{box-sizing:border-box}.modal,[id*="Modal"]{max-width:96vw!important;max-height:92vh!important;overflow-y:auto!important;overflow-x:hidden!important}img{max-width:100%!important}.k-dot{width:28px!important;height:28px!important;min-width:0!important;padding:0!important;font-size:0!important;border-radius:50%!important;background:transparent!important;border:none!important;box-shadow:none!important;overflow:hidden!important;transform:translate(-50%,-50%)!important;z-index:40}.k-dot:hover,.k-dot.k-open{width:auto!important;height:auto!important;padding:4px 8px!important;font-size:12px!important;border-radius:8px!important;background:rgba(15,15,15,.9)!important;color:#fff!important;border:1px solid #d4af37!important;white-space:nowrap!important;z-index:99}`;
-  document.head.appendChild(st);
-
-  document.addEventListener('click', async e => {
-    const b = e.target.closest('button,span,div');
-    if (!b || !b.textContent.includes('×') || b.textContent.length > 50 || b.closest('.k-dot') || typeof activePhoto === 'undefined' || !activePhoto) return;
-    const name = b.textContent.replace('×', '').trim();
-    activePhoto.tags = (activePhoto.tags || []).filter(t => !JSON.stringify(t).includes(name));
-    localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
-    if (typeof renderPhotoPins === 'function') renderPhotoPins();
-    try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch(err){}
-  }, true);
-
-  setInterval(() => {
-    document.querySelectorAll('select').forEach(sel => {
-      if (sel.dataset.f || sel.options.length < 6) return;
-      sel.dataset.f = '1';
-      const opts = [...sel.options].map(o => ({ v: o.value, t: o.text }));
-      const inp = document.createElement('input');
-      inp.placeholder = '🔍 Поиск по имени (2-3 буквы)...';
-      inp.style.cssText = 'width:100%;padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid #d4af37;background:#141414;color:#fff;font-size:14px;box-sizing:border-box';
-      inp.oninput = () => {
-        const q = inp.value.toLowerCase().trim();
-        sel.innerHTML = '';
-        opts.filter(o => o.t.toLowerCase().includes(q)).forEach(o => sel.add(new Option(o.t, o.v)));
-        if (sel.options.length) sel.selectedIndex = 0;
-      };
-      sel.before(inp);
-    });
-
-    document.querySelectorAll('.face-pin').forEach(el => {
-      if (el.dataset.kd) return;
-      el.dataset.kd = '1'; el.classList.add('k-dot');
-      el.onclick = e => { e.stopPropagation(); el.classList.toggle('k-open'); };
-    });
-
-    const lbl = [...document.querySelectorAll('h3,h4,h5,div,span,p,label')].find(el => el.offsetParent && el.textContent.trim().toLowerCase() === 'о человеке');
-    if (!lbl) return;
-    let card = lbl.parentElement;
-    while (card && !card.querySelector('h1,h2,h3')) card = card.parentElement;
-    const name = card?.querySelector('h1,h2,h3')?.textContent.trim();
-    if (!name || card.dataset.kAlbum === name) return;
-    if (typeof mediaList === 'undefined' || !mediaList.length) return;
-
-    card.dataset.kAlbum = name;
-    card.querySelector('#k-gal-box')?.remove();
-    const persons = JSON.parse(localStorage.getItem('chronicle_persons') || '[]');
-    const pObj = persons.find(p => (p.name || '').trim() === name);
-    const pid = pObj ? String(pObj.id) : null;
-
-    const matched = mediaList.filter(m => Array.isArray(m.tags) && m.tags.some(t => {
-      if (!t) return false;
-      return (pid && String(t.personId || t.id) === pid) || String(t.personName || t.name || '').trim() === name;
-    }));
-
-    if (!matched.length) return;
-    const sec = document.createElement('div');
-    sec.id = 'k-gal-box';
-    sec.style.cssText = 'margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333';
-    sec.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${matched.map(m => `<img src="${m.file_url}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`).join('')}</div>`;
-    lbl.before(sec);
-  }, 400);
-}
-{
-  const st = document.createElement('style');
-  st.textContent = `html,body{max-width:100vw!important;overflow-x:hidden!important}*{box-sizing:border-box}.modal,[id*="Modal"]{max-width:96vw!important;max-height:92vh!important;overflow-y:auto!important;overflow-x:hidden!important}img{max-width:100%!important}.k-dot{width:28px!important;height:28px!important;min-width:0!important;padding:0!important;font-size:0!important;border-radius:50%!important;background:transparent!important;border:none!important;box-shadow:none!important;overflow:hidden!important;transform:translate(-50%,-50%)!important;z-index:40}.k-dot:hover,.k-dot.k-open{width:auto!important;height:auto!important;padding:4px 8px!important;font-size:12px!important;border-radius:8px!important;background:rgba(15,15,15,.9)!important;color:#fff!important;border:1px solid #d4af37!important;white-space:nowrap!important;z-index:99}`;
-  document.head.appendChild(st);
-
-  document.addEventListener('click', async e => {
-    const b = e.target.closest('button,span,div');
-    if (!b || !b.textContent.includes('×') || b.textContent.length > 50 || b.closest('.k-dot') || typeof activePhoto === 'undefined' || !activePhoto) return;
-    const name = b.textContent.replace('×', '').trim();
-    activePhoto.tags = (activePhoto.tags || []).filter(t => !JSON.stringify(t).includes(name));
-    localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
-    if (typeof renderPhotoPins === 'function') renderPhotoPins();
-    try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch(err){}
-  }, true);
-
-  setInterval(() => {
-    document.querySelectorAll('select').forEach(sel => {
-      if (sel.dataset.f || sel.options.length < 6) return;
-      sel.dataset.f = '1';
-      const opts = [...sel.options].map(o => ({ v: o.value, t: o.text }));
-      const inp = document.createElement('input');
-      inp.placeholder = '🔍 Поиск по имени (2-3 буквы)...';
-      inp.style.cssText = 'width:100%;padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid #d4af37;background:#141414;color:#fff;font-size:14px;box-sizing:border-box';
-      inp.oninput = () => {
-        const q = inp.value.toLowerCase().trim();
-        sel.innerHTML = '';
-        opts.filter(o => o.t.toLowerCase().includes(q)).forEach(o => sel.add(new Option(o.t, o.v)));
-        if (sel.options.length) sel.selectedIndex = 0;
-      };
-      sel.before(inp);
-    });
-
-    document.querySelectorAll('.face-pin').forEach(el => {
-      if (el.dataset.kd) return;
-      el.dataset.kd = '1'; el.classList.add('k-dot');
-      el.onclick = e => { e.stopPropagation(); el.classList.toggle('k-open'); };
-    });
-
-    const lbl = [...document.querySelectorAll('h3,h4,h5,div,span,p,label')].find(el => el.offsetParent && el.textContent.trim().toLowerCase() === 'о человеке');
-    if (!lbl) return;
-    let card = lbl.parentElement;
-    while (card && !card.querySelector('h1,h2,h3')) card = card.parentElement;
-    const name = card?.querySelector('h1,h2,h3')?.textContent.trim();
-    if (!name || card.dataset.kAlbum === name) return;
-    if (typeof mediaList === 'undefined' || !mediaList.length) return;
-
-    card.dataset.kAlbum = name;
-    card.querySelector('#k-gal-box')?.remove();
-    const persons = JSON.parse(localStorage.getItem('chronicle_persons') || '[]');
-    const pObj = persons.find(p => (p.name || '').trim() === name);
-    const pid = pObj ? String(pObj.id) : null;
-
-    const matched = mediaList.filter(m => Array.isArray(m.tags) && m.tags.some(t => {
-      if (!t) return false;
-      return (pid && String(t.personId || t.id) === pid) || String(t.personName || t.name || '').trim() === name;
-    }));
-
-    if (!matched.length) return;
-    const sec = document.createElement('div');
-    sec.id = 'k-gal-box';
-    sec.style.cssText = 'margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333';
-    sec.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${matched.map(m => `<img src="${m.file_url}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`).join('')}</div>`;
-    lbl.before(sec);
-  }, 400);
-}
-
-
 
 </script>
 </body>
