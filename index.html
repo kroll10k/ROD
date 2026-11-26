@@ -1673,6 +1673,29 @@ if(!document.getElementById('newsBtn')){
   document.body.insertAdjacentHTML('beforeend', `<div id="nMod" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;padding:12px"><div style="background:#1c1f26;color:#eee;max-width:480px;width:100%;border-radius:14px;padding:18px;border:1px solid #d4af37;max-height:82vh;overflow-y:auto;font:14px/1.45 sans-serif"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b style="color:#ffd700;font-size:16px">📜 Что нового и как юзать</b><span onclick="nMod.style.display='none'" style="cursor:pointer;font-size:22px">&times;</span></div><div id="nTxt"></div></div></div>`);
   setInterval(() => { const b=document.getElementById('newsBtn'); if(b) b.onclick=()=>nMod.style.display='flex'; }, 500);
 }
+{
+  const _origOpen = openPersonCard;
+  openPersonCard = function(id) {
+    _origOpen(id);
+    const p = persons.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById("k-p-gal")?.remove();
+    const kPics = (mediaList || []).filter(m => Array.isArray(m.tags) && m.tags.some(t =>
+      t && (String(t.personId) === String(id) || String(t.name || "").trim() === p.name.trim())
+    ));
+    if (!kPics.length) return;
+    const bioEl = document.getElementById("mBio");
+    const target = bioEl.previousElementSibling || bioEl;
+    const imgs = kPics.map(m =>
+      `<img src="${m.file_url || m.url || m.src}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`
+    ).join("");
+    target.insertAdjacentHTML("beforebegin",
+      `<div id="k-p-gal" style="margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333">` +
+      `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div>` +
+      `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${imgs}</div></div>`
+    );
+  };
+}
 
 </script>
 </body>
