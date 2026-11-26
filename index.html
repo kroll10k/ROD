@@ -1956,6 +1956,34 @@ setInterval(() => {
     lbl.before(sec);
   }, 400);
 }
+{
+  setInterval(() => {
+    const lbl = [...document.querySelectorAll('h3,h4,h5,div,span,p,label')].find(el => el.offsetParent && el.textContent.trim().toLowerCase() === 'о человеке');
+    if (!lbl) return;
+    let card = lbl.parentElement;
+    while (card && !card.querySelector('h1,h2,h3')) card = card.parentElement;
+    const name = card?.querySelector('h1,h2,h3')?.textContent.trim();
+    if (!name || card.dataset.phDone === name) return;
+    const media = JSON.parse(localStorage.getItem('chronicle_media') || '[]');
+    if (!media.length) return;
+    card.dataset.phDone = name;
+    card.querySelector('#k-top-gal')?.remove();
+    const persons = JSON.parse(localStorage.getItem('chronicle_persons') || '[]');
+    const pObj = persons.find(p => p.name === name);
+    const shortName = name.split(' ').slice(0, 2).join(' ');
+    const matched = media.filter(m => {
+      const s = JSON.stringify(m);
+      return s.includes(name) || (shortName.length > 5 && s.includes(shortName)) || (pObj && s.includes(String(pObj.id)));
+    });
+    if (!matched.length) return;
+    const getImg = m => m.after_url || m.url || m.src || m.image || m.data || (JSON.stringify(m).match(/(data:image\/[^"]+|https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)/i) || [])[1] || '';
+    const sec = document.createElement('div');
+    sec.id = 'k-top-gal';
+    sec.style.cssText = 'margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333';
+    sec.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto">${matched.map(m => `<img src="${getImg(m)}" style="width:78px;height:78px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0">`).join('')}</div>`;
+    lbl.before(sec);
+  }, 500);
+}
 
 </script>
 </body>
