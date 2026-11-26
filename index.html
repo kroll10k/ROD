@@ -1869,6 +1869,32 @@ setInterval(() => {
     h.closest('.modal')?.querySelector('.modal-body, form, div:last-child')?.appendChild(sec);
   }, 500);
 }
+{
+  const getYr = m => { const x = (m.caption || '').match(/\b(18\d\d|19\d\d|20[0-2]\d)\b/); return x ? +x : 9999; };
+  setInterval(() => {
+    const h = [...document.querySelectorAll('h2')].find(el => el.offsetParent && el.closest('.modal') && !el.closest('#addPersonModal'));
+    if (!h || typeof mediaList === 'undefined') return;
+    const name = h.textContent.trim();
+    const box = h.closest('.modal');
+    if (!name || box.dataset.gal === name) return;
+    box.dataset.gal = name;
+    box.querySelector('#k-view-gal')?.remove();
+    const pObj = (Object.values(window).find(v => Array.isArray(v) && v[0]?.name && v[0]?.id) || []).find(p => p.name === name);
+    const matched = mediaList.filter(m => {
+      const s = JSON.stringify(m.tags || []);
+      return s.includes(name) || (pObj && s.includes(String(pObj.id)));
+    }).sort((a, b) => getYr(a) - getYr(b));
+    if (!matched.length) return;
+    const sec = document.createElement('div');
+    sec.id = 'k-view-gal';
+    sec.style.cssText = 'margin-top:14px;padding-top:10px;border-top:1px solid #333';
+    sec.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:8px;font-weight:700">📸 ФОТО С ЧЕЛОВЕКОМ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">${matched.map(m => {
+      const idx = mediaList.indexOf(m), yr = getYr(m);
+      return `<div style="position:relative;flex-shrink:0;cursor:pointer" onclick="document.querySelectorAll('.close-btn').forEach(b=>b.click());setTimeout(()=>{document.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('Фото'))b.click()});if(typeof openPhotoModal==='function')openPhotoModal(mediaList[${idx}])},150)"><img src="${m.after_url || m.url || m.src}" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #d4af37;display:block"><span style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.85);color:#d4af37;font-size:10px;padding:1px 5px;border-radius:4px;font-weight:700">${yr < 9999 ? yr : 'б/д'}</span></div>`;
+    }).join('')}</div>`;
+    (box.querySelector('.modal-body') || box).appendChild(sec);
+  }, 400);
+}
 
 </script>
 </body>
