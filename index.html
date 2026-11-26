@@ -1721,6 +1721,33 @@ if(!document.getElementById('newsBtn')){
     });
   }, 400);
 }
+{
+  setInterval(() => {
+    document.querySelectorAll('.k-dot').forEach(d => {
+      if (d.querySelector('.k-del')) return;
+      const x = document.createElement('b');
+      x.className = 'k-del';
+      x.textContent = ' ×';
+      x.style.cssText = 'color:#ff5555;margin-left:8px;font-size:15px;cursor:pointer;padding:0 3px';
+      x.onclick = e => {
+        e.stopPropagation();
+        const name = d.firstChild.textContent.trim();
+        Object.keys(localStorage).forEach(k => {
+          const v = localStorage.getItem(k);
+          if (v && v.includes(name) && v.includes('tags')) {
+            try {
+              const arr = JSON.parse(v);
+              arr.forEach(p => { if (Array.isArray(p.tags)) p.tags = p.tags.filter(t => !JSON.stringify(t).includes(name)); });
+              localStorage.setItem(k, JSON.stringify(arr));
+            } catch(err){}
+          }
+        });
+        d.remove();
+      };
+      d.appendChild(x);
+    });
+  }, 400);
+}
 
 
 
