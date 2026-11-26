@@ -2041,6 +2041,59 @@ setInterval(() => {
     lbl.before(sec);
   }, 500);
 }
+{
+  const st = document.createElement('style');
+  st.textContent = `html,body{max-width:100vw!important;overflow-x:hidden!important}*{box-sizing:border-box}.modal,[id*="Modal"]{max-width:96vw!important;max-height:92vh!important;overflow-y:auto!important;overflow-x:hidden!important}img{max-width:100%!important}`;
+  document.head.appendChild(st);
+
+  setInterval(() => {
+    const lbl = [...document.querySelectorAll('h3,h4,h5,div,span,p,label')].find(el => el.offsetParent && el.textContent.trim().toLowerCase() === 'о человеке');
+    if (!lbl) return;
+    let card = lbl.parentElement;
+    while (card && !card.querySelector('h1,h2,h3')) card = card.parentElement;
+    const name = card?.querySelector('h1,h2,h3')?.textContent.trim();
+    if (!name || card.dataset.phFinal === name) return;
+
+    const media = (typeof mediaList !== 'undefined' && Array.isArray(mediaList) && mediaList.length)
+      ? mediaList : JSON.parse(localStorage.getItem('chronicle_media') || '[]');
+    if (!media.length) return;
+
+    card.dataset.phFinal = name;
+    card.querySelector('#k-top-gal')?.remove();
+
+    const persons = (typeof personsList !== 'undefined' && Array.isArray(personsList) && personsList.length)
+      ? personsList : JSON.parse(localStorage.getItem('chronicle_persons') || '[]');
+    const pObj = persons.find(p => p.name === name);
+    const parts = name.split(' ');
+    const io = parts.slice(0, 2).join(' ');
+    const valid = new Set([name, io]);
+    if (pObj?.id != null) valid.add(String(pObj.id));
+    if (pObj?.maiden) valid.add(io + ' ' + pObj.maiden.trim());
+
+    const matched = media.filter(m => {
+      for (const [k, v] of Object.entries(m)) {
+        if (k === 'caption' || k === 'url' || k === 'src' || k === 'after_url' || k === 'back_url' || k === 'id') continue;
+        if (Array.isArray(v)) {
+          const hit = v.some(t => {
+            if (typeof t === 'string' || typeof t === 'number') return valid.has(String(t).trim());
+            if (t && typeof t === 'object') return Object.values(t).some(val => val != null && valid.has(String(val).trim()));
+            return false;
+          });
+          if (hit) return true;
+        }
+      }
+      return false;
+    });
+
+    if (!matched.length) return;
+    const getImg = m => m.after_url || m.url || m.src || m.image || m.data || (JSON.stringify(m).match(/(data:image\/[^"]+|https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)/i) || []) || '';
+    const sec = document.createElement('div');
+    sec.id = 'k-top-gal';
+    sec.style.cssText = 'margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333';
+    sec.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${matched.map(m => `<img src="${getImg(m)}" style="width:78px;height:78px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0">`).join('')}</div>`;
+    lbl.before(sec);
+  }, 400);
+}
 
 </script>
 </body>
