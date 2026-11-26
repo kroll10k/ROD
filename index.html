@@ -2202,6 +2202,35 @@ setInterval(() => {
   }, 300);
 })();
 </script>
+<script>
+setInterval(() => {
+  document.getElementById("k-news-btn")?.remove();
+  const el = [...document.querySelectorAll("*")].find(e => e.offsetParent && e.children.length === 0 && e.textContent.includes("Что нового"));
+  if (!el) return;
+  el.textContent = "📜 Что нового";
+  const box = el.parentElement.parentElement || el.parentElement;
+  if (box.dataset.done) return;
+  box.dataset.done = "1";
+  box.insertAdjacentHTML("beforeend", `
+    <div style="margin-top:12px;font-size:14px;line-height:1.5;color:#e5e7eb">
+      <p><b style="color:#d4af37">Что нового и что исправлено (27.11.2026):</b></p>
+      <ul style="padding-left:18px;margin:6px 0 12px">
+        <li><b>Фотографии в анкетах:</b> в карточке каждого родственника под списком семьи теперь автоматически появляются все фото и документы с его участием (включая девичьи фамилии).</li>
+        <li><b>Точки на лицах:</b> большие таблички заменены на аккуратные золотые кружочки — они не закрывают лица.</li>
+        <li><b>Удаление меток:</b> под каждым снимком есть имена отмеченных людей с крестиком <b>×</b> для быстрого удаления.</li>
+        <li><b>Умный поиск:</b> родственников в списках теперь можно искать по любым буквам и в любом порядке слов.</li>
+        <li><b>Ветка Елены:</b> добавлены и обновлены данные по родственникам со стороны Лены.</li>
+      </ul>
+      <p><b style="color:#d4af37">Как пользоваться:</b></p>
+      <ul style="padding-left:18px;margin:6px 0 0">
+        <li><b>Посмотреть фото человека:</b> откройте его карточку — снизу под семьёй появится полоска «Фотографии».</li>
+        <li><b>Узнать, кто на фото:</b> наведите мышку или нажмите пальцем на золотой кружочек на лице.</li>
+        <li><b>Отметить или убрать человека:</b> откройте фото во вкладке «Фото и сканы», нажмите на лицо для отметки или на <b>×</b> под снимком для удаления.</li>
+      </ul>
+    </div>
+  `);
+}, 250);
+</script>
 
 </body>
 </html>
