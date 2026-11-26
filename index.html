@@ -1777,6 +1777,20 @@ setInterval(() => {
     document.querySelectorAll('.k-dot').forEach(d => { if (d.textContent.includes(name)) d.remove(); });
   }, true);
 }
+{
+  const s = document.createElement('style');
+  s.textContent = `.k-dot:not(:hover):not(.k-open) *{display:none!important}`;
+  document.head.appendChild(s);
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('button,span,div');
+    if (!b || !b.textContent.includes('×') || b.textContent.length > 50 || b.closest('.k-dot') || !window.activePhoto) return;
+    const name = b.textContent.replace('×', '').trim();
+    activePhoto.tags = (activePhoto.tags || []).filter(t => !JSON.stringify(t).includes(name));
+    localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
+    if (typeof renderPhotoPins === 'function') renderPhotoPins();
+    try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch(err){}
+  }, true);
+}
     
 </script>
 </body>
