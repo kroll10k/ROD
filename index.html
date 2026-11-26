@@ -2094,6 +2094,35 @@ setInterval(() => {
     lbl.before(sec);
   }, 400);
 }
+{
+  setInterval(() => {
+    const lbl = [...document.querySelectorAll('h3,h4,h5,div,span,p,label')].find(el => el.offsetParent && el.textContent.trim().toLowerCase() === 'о человеке');
+    if (!lbl) return;
+    let card = lbl.parentElement;
+    while (card && !card.querySelector('h1,h2,h3')) card = card.parentElement;
+    const name = card?.querySelector('h1,h2,h3')?.textContent.trim();
+    if (!name || card.dataset.kFixed === name) return;
+    const media = (typeof mediaList !== 'undefined' && Array.isArray(mediaList) && mediaList.length)
+      ? mediaList : JSON.parse(localStorage.getItem('chronicle_media') || '[]');
+    if (!media.length) return;
+    card.dataset.kFixed = name;
+    card.querySelectorAll('#k-gal-box,#k-top-gal').forEach(e => e.remove());
+    const persons = JSON.parse(localStorage.getItem('chronicle_persons') || '[]');
+    const pObj = persons.find(p => (p.name || '').trim() === name);
+    const matched = media.filter(m => {
+      const copy = { ...m };
+      delete copy.url; delete copy.src; delete copy.after_url; delete copy.back_url; delete copy.caption; delete copy.id;
+      const raw = JSON.stringify(copy);
+      return raw.includes('"' + name + '"') || (pObj?.id != null && (raw.includes(':' + pObj.id) || raw.includes('"' + pObj.id + '"')));
+    });
+    if (!matched.length) return;
+    const sec = document.createElement('div');
+    sec.id = 'k-gal-box';
+    sec.style.cssText = 'margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333';
+    sec.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${matched.map(m => `<img src="${m.after_url || m.url || m.src || m.data}" style="width:78px;height:78px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0">`).join('')}</div>`;
+    lbl.before(sec);
+  }, 400);
+}
 
 </script>
 </body>
