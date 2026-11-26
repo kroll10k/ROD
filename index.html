@@ -531,9 +531,13 @@ r = "all", activePersonId = null, activePhoto = null, pendingClickCoords = null,
     document.getElementById("mName").textContent = p.name;
     document.getElementById("mMaiden").textContent = meta.maiden ? ("Девичья фамилия: " + meta.maiden) : "";
     document.getElementById("mYears").textContent = p.gen + "-е колено • " + (p.years || "");
-     document.getElementById("k-p-gal")?.remove();
-const kPics = mediaList.filter(m => Array.isArray(m.tags) && m.tags.some(t => t && (String(t.personId) === String(id) || String(t.personName || "").trim() === p.name.trim())));
-if (kPics.length) document.getElementById("mBio").parentElement.insertAdjacentHTML("beforebegin", `<div id="k-p-gal" style="margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333"><div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${kPics.map(m => `<img src="${m.file_url}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`).join("")}</div></div>`);
+  document.getElementById("k-p-gal")?.remove();
+  const kPics = (mediaList || []).filter(m => Array.isArray(m.tags) && m.tags.some(t => t && typeof t === "object" && Object.values(t).some(v => v != null && (String(v).trim() === String(id) || String(v).trim() === p.name.trim()))));
+  if (kPics.length) {
+    const bioEl = document.getElementById("mBio");
+    (bioEl.previousElementSibling || bioEl).insertAdjacentHTML("beforebegin", `<div id="k-p-gal" style="margin:10px 0 14px;padding:8px 0;border-top:1px solid #333;border-bottom:1px solid #333"><div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${kPics.map(m => `<img src="${m.file_url}" onclick="closeModal('personModal');openPhotoTagger('${m.id}')" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`).join("")}</div></div>`);
+  }
+
    
     document.getElementById("mBio").textContent = p.bio || "Нет описания";
     document.getElementById("mLoc").textContent = "📍 " + (p.location || "Не указано");
