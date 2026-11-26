@@ -1743,17 +1743,11 @@ if(!document.getElementById('newsBtn')){
     );
   };
 }
-    </script>
-      <script>
+<script>
 setInterval(() => {
-  const lbl = [...document.querySelectorAll("div,h3,h4,h5,label,span")].find(el => el.offsetParent && el.textContent.trim().length < 45 && el.textContent.trim().toLowerCase().includes("семья и родственные связи"));
- 
-
-  if (!lbl) return;
-  const box = lbl.parentElement;
-  const nameEl = document.getElementById("mName");
-  const name = (nameEl ? nameEl.textContent : "").trim();
-  if (!name || box.dataset.kDone === name) return;
+  const box = document.getElementById("mLinksBlock");
+  const name = (document.getElementById("mName")?.textContent || "").trim();
+  if (!box || !box.offsetParent || !name || box.dataset.kDone === name) return;
   box.dataset.kDone = name;
   document.getElementById("k-p-gal")?.remove();
 
@@ -1763,16 +1757,15 @@ setInterval(() => {
     ? persons : JSON.parse(localStorage.getItem("chronicle_persons") || "[]");
   const p = personsArr.find(x => (x.name || "").trim() === name);
 
-  const words = s => (s || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(Boolean);
-  const baseW = words(name);
+  const words = s => (s || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(w => w.length > 1);
   const maidenText = (document.getElementById("mMaiden")?.textContent || "").replace(/Девичья фамилия:\s*/i, "").trim();
-  const altW = maidenText ? [...baseW.filter(w => !w.endsWith("ич") && !w.endsWith("ова") && !w.endsWith("ева") && !w.endsWith("ая")), ...words(maidenText)] : baseW;
+  const allowed = new Set([...words(name), ...words(maidenText)]);
+  const firstName = words(name).find(w => !w.endsWith("ич") && !w.endsWith("на") && !w.endsWith("ова") && !w.endsWith("ева") && !w.endsWith("ая") && !w.endsWith("ский") && !w.endsWith("цкий") && w !== (words(name) || "")) || words(name);
 
   const same = tName => {
-    const tw = new Set(words(tName));
-    if (tw.size < 2) return false;
-    const chk = arr => arr.length >= 2 && arr.every(w => tw.has(w)) && tw.size === arr.length;
-    return chk(baseW) || chk(altW);
+    const tw = words(tName);
+    if (tw.length < 2) return false;
+    return tw.every(w => allowed.has(w)) && (!firstName || tw.includes(firstName));
   };
 
   const kPics = media.filter(m => Array.isArray(m.tags) && m.tags.some(t =>
@@ -1793,11 +1786,7 @@ setInterval(() => {
 }, 300);
 </script>
 
-
-
-
-
-
+</script>
 </body>
 </html>
 
