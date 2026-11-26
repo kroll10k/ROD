@@ -1743,6 +1743,53 @@ if(!document.getElementById('newsBtn')){
     );
   };
 }
+</script>
+<script>
+setInterval(() => {
+  const lbl = [...document.querySelectorAll("*")].find(el => el.children.length === 0 && el.offsetParent && el.textContent.trim() === "СЕМЬЯ И РОДСТВЕННЫЕ СВЯЗИ");
+  if (!lbl) return;
+  const box = lbl.parentElement;
+  const modal = box.closest("[class*='modal'], [id*='Modal']") || box.parentElement;
+  const name = modal?.querySelector("h1,h2,h3")?.textContent.trim();
+  if (!name || box.dataset.kDone === name) return;
+  box.dataset.kDone = name;
+  document.getElementById("k-p-gal")?.remove();
+
+  const media = (typeof mediaList !== "undefined" && Array.isArray(mediaList) && mediaList.length)
+    ? mediaList : JSON.parse(localStorage.getItem("chronicle_media") || "[]");
+  const personsArr = (typeof persons !== "undefined" && Array.isArray(persons) && persons.length)
+    ? persons : JSON.parse(localStorage.getItem("chronicle_persons") || "[]");
+  const p = personsArr.find(x => (x.name || "").trim() === name);
+
+  const words = s => (s || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(Boolean);
+  const baseW = words(name);
+  const maidenText = (modal.textContent.match(/Девичья фамилия:\s*([^\n\r]+)/i) || [])?.trim() || "";
+  const altW = maidenText ? [...baseW.filter(w => !w.endsWith("ич") && !w.endsWith("ова") && !w.endsWith("ева") && !w.endsWith("ая")), ...words(maidenText)] : baseW;
+
+  const same = tName => {
+    const tw = new Set(words(tName));
+    if (tw.size < 2) return false;
+    const chk = arr => arr.length >= 2 && arr.every(w => tw.has(w)) && tw.size === arr.length;
+    return chk(baseW) || chk(altW);
+  };
+
+  const kPics = media.filter(m => Array.isArray(m.tags) && m.tags.some(t =>
+    t && ((p && String(t.personId) === String(p.id)) || same(t.name || t.personName || ""))
+  ));
+
+  const html = kPics.length
+    ? `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${kPics.map(m =>
+        `<img src="${m.file_url || m.url || m.src}" onclick="if(typeof openPhotoTagger==='function'){document.querySelectorAll('.close-btn,[onclick*=closeModal]').forEach(b=>b.click());openPhotoTagger('${m.id}')}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`
+      ).join("")}</div>`
+    : `<div style="font-size:12px;color:#777">На фото пока не отмечен(а)</div>`;
+
+  box.insertAdjacentHTML("afterend",
+    `<div id="k-p-gal" style="margin:12px 0;padding:10px;background:#16181d;border-radius:10px;border:1px solid #2a2d35">` +
+    `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div>` +
+    `${html}</div>`
+  );
+}, 300);
+</script>
 
 </script>
 </body>
