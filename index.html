@@ -1670,8 +1670,9 @@ if(!document.getElementById('newsBtn')){
   if(el) el.innerHTML = `<p><b>1. 3D-карточки и живой поиск</b><br>❌ Было: плоские списки.<br>✅ Стало: объёмные карточки + золотая подсветка.<br>👉 Юзать: вбивай ФИО или год в поиск — человек загорится на схеме.</p><p><b>2. Древо от себя, «Веер» и «🎯 На схеме»</b><br>❌ Было: схема только сверху от одного корня.<br>✅ Стало: корни снизу вверх + ветка от любого родного.<br>👉 Юзать: выбери себя в «👁️ Точке отсчёта» и жми «☀️ Веер».</p><p><b>3. Расширенная анкета и кладбище</b><br>❌ Было: одно поле города.<br>✅ Стало: 3 поля географии, девичья фамилия, гражданство, контакты и GPS могилы.<br>👉 Юзать: открой карточку → «✏️ Анкета».</p><p><b>4. «🧬 Кто кому», «⏳ Лента» и права</b><br>✅ Стало: калькулятор родства, хронология по годам и защита от случайного удаления.</p>`;
 }
 {
+{
   const s = document.createElement('style');
-  s.textContent = `.k-dot{width:14px!important;height:14px!important;min-width:0!important;padding:0!important;font-size:0!important;border-radius:50%!important;background:#d4af37!important;border:2px solid #fff!important;overflow:hidden!important;transform:translate(-50%,-50%)!important;z-index:40}.k-dot.k-open{width:auto!important;height:auto!important;padding:4px 8px!important;font-size:12px!important;border-radius:8px!important;background:#141414!important;color:#fff!important;z-index:99}`;
+  s.textContent = `.k-dot{width:28px!important;height:28px!important;min-width:0!important;padding:0!important;font-size:0!important;border-radius:50%!important;background:transparent!important;border:none!important;box-shadow:none!important;overflow:hidden!important;transform:translate(-50%,-50%)!important;z-index:40}.k-dot:hover,.k-dot.k-open{width:auto!important;height:auto!important;padding:4px 8px!important;font-size:12px!important;border-radius:8px!important;background:rgba(15,15,15,.9)!important;color:#fff!important;border:1px solid #d4af37!important;white-space:nowrap!important;z-index:99}`;
   document.head.appendChild(s);
   setInterval(() => {
     document.querySelectorAll('div,span,button').forEach(el => {
@@ -1683,6 +1684,44 @@ if(!document.getElementById('newsBtn')){
     });
   }, 400);
 }
+{
+  setInterval(() => {
+    const inp = [...document.querySelectorAll('input')].find(i => i.value?.includes('.jpg') || i.previousElementSibling?.textContent?.includes('ПОДПИСЬ'));
+    if (!inp) return;
+    let bar = document.getElementById('k-tags-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'k-tags-bar';
+      bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;width:100%';
+      inp.parentElement.before(bar);
+    }
+    const dots = [...document.querySelectorAll('.k-dot')].filter(d => d.offsetParent);
+    if (bar.dataset.cnt == dots.length) return;
+    bar.dataset.cnt = dots.length;
+    bar.innerHTML = '';
+    dots.forEach((d, idx) => {
+      const name = d.textContent.trim();
+      const chip = document.createElement('span');
+      chip.style.cssText = 'background:#222;border:1px solid #d4af37;color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer';
+      chip.innerHTML = `${name} <b style="color:#ff5555;font-size:15px">×</b>`;
+      chip.onclick = () => {
+        Object.keys(localStorage).forEach(k => {
+          const v = localStorage.getItem(k);
+          if (v && v.includes(name) && v.includes(inp.value)) {
+            try {
+              const arr = JSON.parse(v);
+              const f = arr.find(p => JSON.stringify(p).includes(inp.value));
+              if (f && Array.isArray(f.tags)) { f.tags.splice(idx, 1); localStorage.setItem(k, JSON.stringify(arr)); }
+            } catch(e){}
+          }
+        });
+        d.remove(); bar.dataset.cnt = -1;
+      };
+      bar.appendChild(chip);
+    });
+  }, 400);
+}
+
 
 
 </script>
