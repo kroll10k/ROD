@@ -2160,6 +2160,18 @@ setInterval(() => {
   `);
 }, 300);
 </script>
+<style>
+  #k-news-btn { display: none !important; }
+</style>
+<script>
+setInterval(() => {
+  document.querySelectorAll("button, a").forEach(b => {
+    if (b.id !== "k-news-btn" && b.textContent.trim().includes("Что нового и как юзать")) {
+      b.innerHTML = b.innerHTML.replace("Что нового и как юзать", "Что нового и как пользоваться");
+    }
+  });
+}, 400);
+</script>
 
 </body>
 </html>
