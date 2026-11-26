@@ -1759,13 +1759,15 @@ setInterval(() => {
 
   const words = s => (s || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(w => w.length > 1);
   const maidenText = (document.getElementById("mMaiden")?.textContent || "").replace(/Девичья фамилия:\s*/i, "").trim();
-  const allowed = new Set([...words(name), ...words(maidenText)]);
-  const firstName = words(name).find(w => !w.endsWith("ич") && !w.endsWith("на") && !w.endsWith("ова") && !w.endsWith("ева") && !w.endsWith("ая") && !w.endsWith("ский") && !w.endsWith("цкий") && w !== (words(name) || "")) || words(name);
+  const nameWords = words(name);
+  const allowed = new Set([...nameWords, ...words(maidenText)]);
+  const surEx = /(ова|ева|ина|ая|ская|цкая|ов|ев|ин|ий|ский|цкий|ич|вич|чна|вна)$/;
+  const firstName = nameWords.find(w => !surEx.test(w)) || nameWords;
 
   const same = tName => {
     const tw = words(tName);
     if (tw.length < 2) return false;
-    return tw.every(w => allowed.has(w)) && (!firstName || tw.includes(firstName));
+    return tw.every(w => allowed.has(w)) && tw.includes(firstName);
   };
 
   const kPics = media.filter(m => Array.isArray(m.tags) && m.tags.some(t =>
@@ -1786,7 +1788,6 @@ setInterval(() => {
 }, 300);
 </script>
 
-</script>
 </body>
 </html>
 
