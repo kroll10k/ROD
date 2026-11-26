@@ -1787,6 +1787,143 @@ setInterval(() => {
   );
 }, 300);
 </script>
+<script>
+(() => {
+  const words = s => (s || "").toLowerCase().replace(/[^а-яёa-z0-9\s]/gi, " ").trim().split(/\s+/).filter(w => w.length > 1);
+  const surEx = /(ова|ева|ина|ая|ская|цкая|ов|ев|ин|ий|ский|цкий|ич|вич|чна|вна)$/;
+  const matchTokens = (query, target) => {
+    const qw = words(query);
+    if (!qw.length) return true;
+    const tLow = (target || "").toLowerCase();
+    return qw.every(w => tLow.includes(w));
+  };
+
+  // 1. Окно замены / удаления метки при клике на плашку на фото
+  document.addEventListener("click", e => {
+    const pin = e.target.closest(".face-pin");
+    if (!pin || typeof activePhoto === "undefined" || !activePhoto) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const oldTxt = pin.textContent.replace("×", "").trim();
+    const pList = (typeof persons !== "undefined" && Array.isArray(persons) && persons.length)
+      ? persons : JSON.parse(localStorage.getItem("chronicle_persons") || "[]");
+
+    document.getElementById("k-pin-edit")?.remove();
+    const pop = document.createElement("div");
+    pop.id = "k-pin-edit";
+    pop.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:99999;display:flex;align-items:center;justify-content:center;padding:12px";
+    pop.innerHTML = `
+      <div style="background:#16181d;border:1px solid #d4af37;border-radius:12px;padding:14px;width:100%;max-width:360px;color:#fff;font-family:inherit">
+        <div style="font-size:13px;color:#d4af37;font-weight:700;margin-bottom:8px">Метка: «${oldTxt}»</div>
+        <input id="k-pin-q" placeholder="🔍 Введи имя или фамилию (в любом порядке)..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff;font-size:14px;margin-bottom:8px;box-sizing:border-box">
+        <select id="k-pin-sel" size="6" style="width:100%;padding:6px;border-radius:8px;border:1px solid #444;background:#0f1115;color:#fff;font-size:13px;margin-bottom:10px"></select>
+        <div style="display:flex;gap:8px;justify-content:space-between">
+          <button id="k-pin-del" style="background:#7a1c1c;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600">🗑 Удалить</button>
+          <div style="display:flex;gap:6px">
+            <button id="k-pin-cancel" style="background:#2a2d35;color:#ccc;border:none;padding:8px 12px;border-radius:8px;cursor:pointer">Отмена</button>
+            <button id="k-pin-save" style="background:#d4af37;color:#111;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700">✔ Заменить</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+
+    const qInp = document.getElementById("k-pin-q");
+    const sel = document.getElementById("k-pin-sel");
+    const fill = (q = "") => {
+      sel.innerHTML = "";
+      pList.filter(p => matchTokens(q, p.name + " " + (p.maiden || ""))).forEach(p => {
+        const opt = new Option(p.name + (p.years ? ` (${p.years})` : ""), p.id);
+        sel.add(opt);
+      });
+      if (sel.options.length) sel.selectedIndex = 0;
+    };
+    fill();
+    qInp.focus();
+    qInp.oninput = () => fill(qInp.value);
+
+    const saveTags = async () => {
+      localStorage.setItem("chronicle_media", JSON.stringify(mediaList));
+      if (typeof renderPhotoPins === "function") renderPhotoPins();
+      try { await sbFetch("media", "PATCH", { tags: activePhoto.tags }, "?id=eq." + activePhoto.id); } catch (err) {}
+      pop.remove();
+    };
+
+    document.getElementById("k-pin-cancel").onclick = () => pop.remove();
+    document.getElementById("k-pin-del").onclick = async () => {
+      activePhoto.tags = (activePhoto.tags || []).filter(t => String(t.name || t.personName || "").trim() !== oldTxt);
+      await saveTags();
+    };
+    document.getElementById("k-pin-save").onclick = async () => {
+      const newId = sel.value;
+      const newObj = pList.find(p => String(p.id) === String(newId));
+      if (!newObj) return;
+      activePhoto.tags = (activePhoto.tags || []).map(t => {
+        if (String(t.name || t.personName || "").trim() === oldTxt) {
+          return { ...t, personId: newObj.id, name: newObj.name };
+        }
+        return t;
+      });
+      await saveTags();
+    };
+  }, true);
+
+  // 2. Поиск по словам без учёта порядка во всех списках + авто-подбор фоток с учётом фамилий семьи
+  setInterval(() => {
+    document.querySelectorAll("select").forEach(sel => {
+      if (sel.id === "k-pin-sel" || sel.dataset.kSearch || sel.options.length < 5) return;
+      sel.dataset.kSearch = "1";
+      const orig = [...sel.options].map(o => ({ v: o.value, t: o.text }));
+      const inp = document.createElement("input");
+      inp.placeholder = "🔍 Поиск по имени / фамилии (любой порядок слов)...";
+      inp.style.cssText = "width:100%;padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid #d4af37;background:#141414;color:#fff;font-size:14px;box-sizing:border-box";
+      inp.oninput = () => {
+        const q = inp.value;
+        sel.innerHTML = "";
+        orig.filter(o => matchTokens(q, o.t)).forEach(o => sel.add(new Option(o.t, o.v)));
+        if (sel.options.length) sel.selectedIndex = 0;
+      };
+      sel.before(inp);
+    });
+
+    const gal = document.getElementById("k-p-gal");
+    const name = (document.getElementById("mName")?.textContent || "").trim();
+    if (!gal || !name || gal.dataset.kSmart === name) return;
+    gal.dataset.kSmart = name;
+
+    const media = (typeof mediaList !== "undefined" && Array.isArray(mediaList) && mediaList.length)
+      ? mediaList : JSON.parse(localStorage.getItem("chronicle_media") || "[]");
+    const personsArr = (typeof persons !== "undefined" && Array.isArray(persons) && persons.length)
+      ? persons : JSON.parse(localStorage.getItem("chronicle_persons") || "[]");
+    const p = personsArr.find(x => (x.name || "").trim() === name);
+
+    const nameWords = words(name);
+    const maidenText = (document.getElementById("mMaiden")?.textContent || "").replace(/Девичья фамилия:\s*/i, "").trim();
+    const linksText = document.getElementById("mLinksBlock")?.textContent || "";
+    const famSurnames = words(linksText).filter(w => /(ова|ева|ина|ая|ская|цкая|ов|ев|ин|ий|ский|цкий|ич)$/.test(w) && !w.endsWith("ович") && !w.endsWith("евич") && !w.endsWith("инична"));
+    const allowed = new Set([...nameWords, ...words(maidenText), ...famSurnames]);
+    const firstName = nameWords.find(w => !surEx.test(w)) || nameWords;
+
+    const same = tName => {
+      const tw = words(tName);
+      if (!tw.length || !firstName) return false;
+      return tw.includes(firstName) && (tw.length === 1 || tw.every(w => allowed.has(w)));
+    };
+
+    const kPics = media.filter(m => Array.isArray(m.tags) && m.tags.some(t =>
+      t && ((p && String(t.personId) === String(p.id)) || same(t.name || t.personName || ""))
+    ));
+
+    const html = kPics.length
+      ? `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${kPics.map(m =>
+          `<img src="${m.file_url || m.url || m.src}" onclick="if(typeof openPhotoTagger==='function'){document.querySelectorAll('.close-btn,[onclick*=closeModal]').forEach(b=>b.click());openPhotoTagger('${m.id}')}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;flex-shrink:0;cursor:pointer">`
+        ).join("")}</div>`
+      : `<div style="font-size:12px;color:#777">На фото пока не отмечен(а)</div>`;
+
+    gal.innerHTML = `<div style="font-size:11px;color:#d4af37;margin-bottom:6px;font-weight:700">📸 ФОТОГРАФИИ (${kPics.length})</div>${html}`;
+  }, 350);
+})();
+</script>
 
 </body>
 </html>
