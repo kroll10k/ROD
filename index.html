@@ -1852,6 +1852,23 @@ setInterval(() => {
     inp.parentElement.after(box);
   }, 400);
 }
+{
+  setInterval(() => {
+    const h = document.querySelector('#personModal h2, .modal h2');
+    if (!h || typeof mediaList === 'undefined') return;
+    const name = h.textContent.trim();
+    if (!name || h.dataset.ph === name) return;
+    h.dataset.ph = name;
+    document.getElementById('k-person-photos')?.remove();
+    const matched = mediaList.filter(m => JSON.stringify(m.tags || []).includes(name));
+    if (!matched.length) return;
+    const sec = document.createElement('div');
+    sec.id = 'k-person-photos';
+    sec.style.cssText = 'margin:14px 0;padding-top:10px;border-top:1px solid #333';
+    sec.innerHTML = `<div style="font-size:11px;color:#888;margin-bottom:8px">📸 НА ФОТОГРАФИЯХ (${matched.length})</div><div style="display:flex;gap:8px;overflow-x:auto">${matched.map(m => `<img src="${m.after_url || m.url || m.src}" style="width:76px;height:76px;object-fit:cover;border-radius:8px;border:1px solid #d4af37;cursor:pointer" onclick="document.querySelector('[data-tab=photos],button')?.click()">`).join('')}</div>`;
+    h.closest('.modal')?.querySelector('.modal-body, form, div:last-child')?.appendChild(sec);
+  }, 500);
+}
 
 </script>
 </body>
